@@ -1,5 +1,5 @@
 cmake_minimum_required (VERSION 2.8.11)
-project (hyperscan C CXX)
+project (vectorscan C CXX)
 
 set (HS_MAJOR_VERSION 5)
 set (HS_MINOR_VERSION 4)
@@ -620,7 +620,7 @@ set (hs_exec_SRCS
     src/hwlm/hwlm.c
     src/hwlm/hwlm.h
     src/hwlm/hwlm_internal.h
-    src/hwlm/noodle_engine.c
+    src/hwlm/noodle_engine.cpp
     src/hwlm/noodle_engine.h
     src/hwlm/noodle_internal.h
     src/nfa/accel.c
