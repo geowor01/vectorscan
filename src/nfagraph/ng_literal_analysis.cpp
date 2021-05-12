@@ -113,7 +113,7 @@ void dumpGraph(const char *filename, const LitGraph &lg) {
             fout << "[label=\"SINK\"];";
         } else {
             ue2_literal s;
-            s.emplace_back(lg[v].c);
+            s.push_back(lg[v].c);
             fout << "[label=\"" << dumpString(s) << "\"];";
         }
         fout << endl;
