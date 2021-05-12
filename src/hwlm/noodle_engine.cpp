@@ -58,22 +58,8 @@ struct cb_info {
     size_t offsetAdj; //!< used in streaming mode
 };
 
-#if defined(HAVE_AVX512)
-#define CHUNKSIZE 64
-#define MASK_TYPE m512
-#define Z_BITS 64
-#define Z_TYPE u64a
-#elif defined(HAVE_AVX2)
-#define CHUNKSIZE 32
-#define MASK_TYPE m256
-#define Z_BITS 32
-#define Z_TYPE u32
-#else
-#define CHUNKSIZE 16
-#define MASK_TYPE m128
-#define Z_BITS 32
-#define Z_TYPE u32
-#endif
+
+#include "noodle_engine_simd.hpp"
 
 #define RETURN_IF_TERMINATED(x)                                                \
     {                                                                          \
@@ -81,11 +67,6 @@ struct cb_info {
             return HWLM_TERMINATED;                                            \
         }                                                                      \
     }
-
-static really_inline
-u8 caseClear8(u8 x, bool noCase) {
-    return (u8)(noCase ? (x & (u8)0xdf) : x);
-}
 
 // Make sure the rest of the string is there. The single character scanner
 // is used only for single chars with case insensitivity used correctly,
@@ -143,25 +124,6 @@ hwlm_error_t double_zscan(const struct noodTable *n,const u8 *d, const u8 *buf,
     return HWLM_SUCCESS;
 }
 
-#if defined(HAVE_AVX512)
-#define CHUNKSIZE 64
-#define MASK_TYPE m512
-#define ONES ones512()
-#include "noodle_engine_avx512.c"
-#elif defined(HAVE_AVX2)
-#define CHUNKSIZE 32
-#define MASK_TYPE m256
-#define ONES ones256()
-#include "noodle_engine_avx2.c"
-#else
-#define CHUNKSIZE 16
-#define MASK_TYPE m128
-#define ONES ones128()
-#include "noodle_engine_sse.c"
-#endif
-
-#include "noodle_engine_simd.hpp"
-
 template <uint16_t S>
 static really_inline
 hwlm_error_t scanSingleMain(const struct noodTable *n, const u8 *buf,
@@ -176,8 +138,8 @@ hwlm_error_t scanSingleMain(const struct noodTable *n, const u8 *buf,
     hwlm_error_t rv;
 
     if (end - offset <= S) {
-        // return scanSingleUnaligned2(n, buf, caseMask, mask1, cbi, len, offset, end);
-        return scanSingleUnaligned(n, buf, len, offset, caseMask.u.v128[0], mask1.u.v128[0], cbi, offset, end);
+        return scanSingleUnaligned2(n, buf, caseMask, mask1, cbi, len, offset, end);
+        //return scanSingleUnaligned(n, buf, len, offset, caseMask.u.v512[0], mask1.u.v512[0], cbi, offset, end);
     }
 
     uintptr_t data = (uintptr_t)buf;
@@ -186,21 +148,21 @@ hwlm_error_t scanSingleMain(const struct noodTable *n, const u8 *buf,
     if (offset != s2Start) {
         // first scan out to the fast scan starting point
         DEBUG_PRINTF("stage 1: -> %zu\n", s2Start);
-        // rv = scanSingleUnaligned2(n, buf, caseMask, mask1, cbi, len, offset, s2Start);
-        rv = scanSingleUnaligned(n, buf, len, offset, caseMask.u.v128[0], mask1.u.v128[0], cbi, offset, s2Start);
+        rv = scanSingleUnaligned2(n, buf, caseMask, mask1, cbi, len, offset, s2Start);
+        //rv = scanSingleUnaligned(n, buf, len, offset, caseMask.u.v512[0], mask1.u.v512[0], cbi, offset, s2Start);
         RETURN_IF_TERMINATED(rv);
     }
     uintptr_t last = data + end;
     uintptr_t s2End = ROUNDDOWN_N(last, S) - data;
-    // size_t loops = s2End / S;
+    size_t loops = s2End / S;
 
-    // if (likely(loops)) {
-    if (likely(s2Start != s2End)) {
+    if (likely(loops)) {
+    //if (likely(s2Start != s2End)) {
         // scan as far as we can, bounded by the last point this key can
         // possibly match
         DEBUG_PRINTF("fast: ~ %zu -> %zu\n", s2Start, s2End);
-        // rv = scanSingleFast(n, buf, len, caseMask, mask1, cbi, s2Start, loops);
-        rv = scanSingleFast(n, buf, len, caseMask.u.v128[0], mask1.u.v128[0], cbi, s2Start, end);
+        rv = scanSingleFast2(n, buf, len, caseMask, mask1, cbi, s2Start, loops);
+        //rv = scanSingleFast(n, buf, len, caseMask.u.v512[0], mask1.u.v512[0], cbi, s2Start, s2End);
         RETURN_IF_TERMINATED(rv);
     }
 
@@ -208,14 +170,14 @@ hwlm_error_t scanSingleMain(const struct noodTable *n, const u8 *buf,
         return HWLM_SUCCESS;
     }
     // if we are done bail out
-    // if (s2End != len) {
+    //if (s2End != len) {
         DEBUG_PRINTF("stage 3: %zu -> %zu\n", s2End, len);
-        // rv = scanSingleUnaligned2(n, buf, caseMask, mask1, cbi, len, s2End, len);
-        rv = scanSingleUnaligned(n, buf, len, s2End, caseMask.u.v128[0], mask1.u.v128[0], cbi, s2End, len);
+        rv = scanSingleUnaligned2(n, buf, caseMask, mask1, cbi, len, s2End, len);
+        //rv = scanSingleUnaligned(n, buf, len, s2End, caseMask.u.v512[0], mask1.u.v512[0], cbi, s2End, len);
         return rv;
-    // }
+     //}
 
-    // return HWLM_SUCCESS;
+     //return HWLM_SUCCESS;
 }
 
 template <uint16_t S>
@@ -234,8 +196,8 @@ hwlm_error_t scanDoubleMain(const struct noodTable *n, const u8 *buf,
     hwlm_error_t rv;
 
     if (end - offset <= S) {
-        // rv = scanDoubleUnaligned2(n, buf, caseMask, mask1, mask2, cbi, len, offset, offset, end);
-        rv = scanDoubleUnaligned(n, buf, len, offset, caseMask.u.v128[0], mask1.u.v128[0], mask2.u.v128[0], cbi, offset, end);
+        rv = scanDoubleUnaligned2(n, buf, caseMask, mask1, mask2, cbi, len, offset, offset, end);
+        //rv = scanDoubleUnaligned(n, buf, len, offset, caseMask.u.v512[0], mask1.u.v512[0], mask2.u.v512[0], cbi, offset, end);
         return rv;
     }
 
@@ -248,8 +210,8 @@ hwlm_error_t scanDoubleMain(const struct noodTable *n, const u8 *buf,
         // first scan out to the fast scan starting point plus one char past to
         // catch the key on the overlap
         DEBUG_PRINTF("stage 1: %zu -> %zu\n", off, s2Start);
-        // rv = scanDoubleUnaligned2(n, buf, caseMask, mask1, mask2, cbi, len, offset, off, end);
-        rv = scanDoubleUnaligned(n, buf, len, offset, caseMask.u.v128[0], mask1.u.v128[0], mask2.u.v128[0], cbi, off, end);
+        rv = scanDoubleUnaligned2(n, buf, caseMask, mask1, mask2, cbi, len, offset, off, s1End);
+        //rv = scanDoubleUnaligned(n, buf, len, offset, caseMask.u.v512[0], mask1.u.v512[0], mask2.u.v512[0], cbi, off, s1End);
         RETURN_IF_TERMINATED(rv);
     }
     off = s1End;
@@ -262,15 +224,15 @@ hwlm_error_t scanDoubleMain(const struct noodTable *n, const u8 *buf,
         return HWLM_SUCCESS;
     }
 
-    // size_t loops = s2End / S;
+    //size_t loops = (s2End -s2Start)/ S;
 
     if (likely(s2Start != s2End)) {
-    // if (likely(loops)) {
+    //if (likely(loops)) {
         // scan as far as we can, bounded by the last point this key can
         // possibly match
         DEBUG_PRINTF("fast: ~ %zu -> %zu\n", s2Start, s3Start);
-        // rv = scanDoubleFast2(n, buf, len, caseMask, mask1, mask2, cbi, s2Start, end);
-        rv = scanDoubleFast(n, buf, len, caseMask.u.v128[0], mask1.u.v128[0], mask2.u.v128[0], cbi, s2Start, end);
+        rv = scanDoubleFast2(n, buf, len, caseMask, mask1, mask2, cbi, s2Start, s2End);
+        //rv = scanDoubleFast(n, buf, len, caseMask.u.v512[0], mask1.u.v512[0], mask2.u.v512[0], cbi, s2Start, s2End);
         RETURN_IF_TERMINATED(rv);
         off = s2End;
     }
@@ -281,8 +243,8 @@ hwlm_error_t scanDoubleMain(const struct noodTable *n, const u8 *buf,
     }
 
     DEBUG_PRINTF("stage 3: %zu -> %zu\n", s3Start, end);
-    // rv = scanDoubleUnaligned2(n, buf, caseMask, mask1, mask2, cbi, len, s3Start, off, end);
-    rv = scanDoubleUnaligned(n, buf, len, s3Start, caseMask.u.v128[0], mask1.u.v128[0], mask2.u.v128[0], cbi, off, end);
+    rv = scanDoubleUnaligned2(n, buf, caseMask, mask1, mask2, cbi, len, s3Start, off, end);
+    //rv = scanDoubleUnaligned(n, buf, len, s3Start, caseMask.u.v512[0], mask1.u.v512[0], mask2.u.v512[0], cbi, off, end);
 
     return rv;
 }
@@ -295,8 +257,8 @@ hwlm_error_t scanSingle(const struct noodTable *n, const u8 *buf, size_t len,
         noCase = 0; // force noCase off if we don't have an alphabetic char
     }
 
-    const SuperVector<CHUNKSIZE> caseMask{noCase ? getCaseMask() : ONES};
-    const SuperVector<CHUNKSIZE> mask1{getMask(n->key0, noCase)};
+    const SuperVector<VECTORSIZE> caseMask{noCase ? getCaseMask<VECTORSIZE>() : SuperVector<VECTORSIZE>::Ones()};
+    const SuperVector<VECTORSIZE> mask1{getMask<VECTORSIZE>(n->key0, noCase)};
 
     return scanSingleMain(n, buf, len, start, caseMask, mask1, cbi);
 }
@@ -306,9 +268,9 @@ static really_inline
 hwlm_error_t scanDouble(const struct noodTable *n, const u8 *buf, size_t len,
                         size_t start, bool noCase, const struct cb_info *cbi) {
 
-    const SuperVector<CHUNKSIZE> caseMask{noCase ? getCaseMask() : ONES};
-    const SuperVector<CHUNKSIZE> mask1{getMask(n->key0, noCase)};
-    const SuperVector<CHUNKSIZE> mask2{getMask(n->key1, noCase)};
+    const SuperVector<VECTORSIZE> caseMask{noCase ? getCaseMask<VECTORSIZE>() : SuperVector<VECTORSIZE>::Ones()};
+    const SuperVector<VECTORSIZE> mask1{getMask<VECTORSIZE>(n->key0, noCase)};
+    const SuperVector<VECTORSIZE> mask2{getMask<VECTORSIZE>(n->key1, noCase)};
 
     return scanDoubleMain(n, buf, len, start, caseMask, mask1, mask2, cbi);
 }
