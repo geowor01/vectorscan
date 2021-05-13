@@ -100,9 +100,9 @@ match:
 
 static really_really_inline
 hwlm_error_t single_zscan(const struct noodTable *n,const u8 *d, const u8 *buf,
-		Z_TYPE *z, size_t len, const struct cb_info *cbi) {
-    while (unlikely(*z)) {
-        Z_TYPE pos = JOIN(findAndClearLSB_, Z_BITS)(z);
+		Z_TYPE z, size_t len, const struct cb_info *cbi) {
+    while (unlikely(z)) {
+        Z_TYPE pos = JOIN(findAndClearLSB_, Z_BITS)(&z);
         size_t matchPos = d - buf + pos;
         DEBUG_PRINTF("match pos %zu\n", matchPos);
         hwlmcb_rv_t rv = final(n, buf, len, 1, cbi, matchPos);
@@ -113,9 +113,9 @@ hwlm_error_t single_zscan(const struct noodTable *n,const u8 *d, const u8 *buf,
 
 static really_really_inline
 hwlm_error_t double_zscan(const struct noodTable *n,const u8 *d, const u8 *buf,
-		Z_TYPE *z, size_t len, const struct cb_info *cbi) {
-    while (unlikely(*z)) {
-        Z_TYPE pos = JOIN(findAndClearLSB_, Z_BITS)(z);
+		Z_TYPE z, size_t len, const struct cb_info *cbi) {
+    while (unlikely(z)) {
+        Z_TYPE pos = JOIN(findAndClearLSB_, Z_BITS)(&z);
         size_t matchPos = d - buf + pos - 1;                               \
         DEBUG_PRINTF("match pos %zu\n", matchPos);
         hwlmcb_rv_t rv = final(n, buf, len, 0, cbi, matchPos);
@@ -127,126 +127,99 @@ hwlm_error_t double_zscan(const struct noodTable *n,const u8 *d, const u8 *buf,
 template <uint16_t S>
 static really_inline
 hwlm_error_t scanSingleMain(const struct noodTable *n, const u8 *buf,
-                            size_t len, size_t start,
-			                SuperVector<S> caseMask, SuperVector<S> mask1,
+                            size_t len, size_t offset,
+                            SuperVector<S> caseMask, SuperVector<S> mask1,
                             const struct cb_info *cbi) {
-
-    size_t offset = start + n->msk_len - 1;
+    size_t start = offset + n->msk_len - 1;
     size_t end = len;
-    assert(offset < end);
 
-    hwlm_error_t rv;
+    const u8 *d = buf + start;
+    const u8 *e = buf + end;
+    DEBUG_PRINTF("start %p end %p \n", d, e);
+    assert(d < e);
+    if (d + S <= e) {
+        // peel off first part to cacheline boundary
+        const u8 *d1 = ROUNDUP_PTR(d, S);
+        DEBUG_PRINTF("until aligned %p \n", d1);
+        if (scanSingleUnaligned(n, buf, caseMask, mask1, cbi, len, start, d1 - buf) == HWLM_TERMINATED) {
+            return HWLM_TERMINATED;
+        }
+        d = d1;
 
-    if (end - offset <= S) {
-        return scanSingleUnaligned2(n, buf, caseMask, mask1, cbi, len, offset, end);
-        //return scanSingleUnaligned(n, buf, len, offset, caseMask.u.v512[0], mask1.u.v512[0], cbi, offset, end);
+        size_t loops = (end - (d - buf)) / S;
+        DEBUG_PRINTF("loops %ld \n", loops);
+
+        for (size_t i = 0; i < loops; i++, d+= S) {
+            DEBUG_PRINTF("d %p \n", d);
+            const u8 *base = ROUNDUP_PTR(d, 64);
+            // On large packet buffers, this prefetch appears to get us about 2%.
+            __builtin_prefetch(base + 256);
+
+            SuperVector<S> v = SuperVector<S>::load(d) & caseMask;
+            typename SuperVector<S>::movemask_type z = mask1.eqmask(v);
+
+            hwlm_error_t rv = single_zscan(n, d, buf, z, len, cbi);
+            RETURN_IF_TERMINATED(rv);
+        }
     }
 
-    uintptr_t data = (uintptr_t)buf;
-    uintptr_t s2Start = ROUNDUP_N(data + offset, S) - data;
+    DEBUG_PRINTF("d %p e %p \n", d, e);
+    // finish off tail
 
-    if (offset != s2Start) {
-        // first scan out to the fast scan starting point
-        DEBUG_PRINTF("stage 1: -> %zu\n", s2Start);
-        rv = scanSingleUnaligned2(n, buf, caseMask, mask1, cbi, len, offset, s2Start);
-        //rv = scanSingleUnaligned(n, buf, len, offset, caseMask.u.v512[0], mask1.u.v512[0], cbi, offset, s2Start);
-        RETURN_IF_TERMINATED(rv);
-    }
-    uintptr_t last = data + end;
-    uintptr_t s2End = ROUNDDOWN_N(last, S) - data;
-    size_t loops = s2End / S;
-
-    if (likely(loops)) {
-    //if (likely(s2Start != s2End)) {
-        // scan as far as we can, bounded by the last point this key can
-        // possibly match
-        DEBUG_PRINTF("fast: ~ %zu -> %zu\n", s2Start, s2End);
-        rv = scanSingleFast2(n, buf, len, caseMask, mask1, cbi, s2Start, loops);
-        //rv = scanSingleFast(n, buf, len, caseMask.u.v512[0], mask1.u.v512[0], cbi, s2Start, s2End);
-        RETURN_IF_TERMINATED(rv);
-    }
-
-    if (s2End == len) {
-        return HWLM_SUCCESS;
-    }
-    // if we are done bail out
-    //if (s2End != len) {
-        DEBUG_PRINTF("stage 3: %zu -> %zu\n", s2End, len);
-        rv = scanSingleUnaligned2(n, buf, caseMask, mask1, cbi, len, s2End, len);
-        //rv = scanSingleUnaligned(n, buf, len, s2End, caseMask.u.v512[0], mask1.u.v512[0], cbi, s2End, len);
-        return rv;
-     //}
-
-     //return HWLM_SUCCESS;
+    return scanSingleUnaligned(n, buf, caseMask, mask1, cbi, len, d - buf, end);
 }
 
 template <uint16_t S>
 static really_inline
 hwlm_error_t scanDoubleMain(const struct noodTable *n, const u8 *buf,
-                            size_t len, size_t start, 
-			                SuperVector<S> caseMask, SuperVector<S> mask1, SuperVector<S> mask2,
+                            size_t len, size_t offset, 
+                            SuperVector<S> caseMask, SuperVector<S> mask1, SuperVector<S> mask2,
                             const struct cb_info *cbi) {
     // we stop scanning for the key-fragment when the rest of the key can't
     // possibly fit in the remaining buffer
     size_t end = len - n->key_offset + 2;
 
-    // the first place the key can match
-    size_t offset = start + n->msk_len - n->key_offset;
+    size_t start = offset + n->msk_len - n->key_offset;
 
-    hwlm_error_t rv;
+    typename SuperVector<S>::movemask_type lastz1{0};
 
-    if (end - offset <= S) {
-        rv = scanDoubleUnaligned2(n, buf, caseMask, mask1, mask2, cbi, len, offset, offset, end);
-        //rv = scanDoubleUnaligned(n, buf, len, offset, caseMask.u.v512[0], mask1.u.v512[0], mask2.u.v512[0], cbi, offset, end);
-        return rv;
+    const u8 *d = buf + start;
+    const u8 *e = buf + end;
+    DEBUG_PRINTF("start %p end %p \n", d, e);
+    assert(d < e);
+    if (d + S <= e) {
+        // peel off first part to cacheline boundary
+        const u8 *d1 = ROUNDUP_PTR(d, S);
+        DEBUG_PRINTF("until aligned %p \n", d1);
+        if (scanDoubleUnaligned(n, buf, caseMask, mask1, mask2, &lastz1, cbi, len, start, d1 - buf) == HWLM_TERMINATED) {
+            return HWLM_TERMINATED;
+        }
+        d = d1;
+
+        size_t loops = (end - (d - buf)) / S;
+        DEBUG_PRINTF("loops %ld \n", loops);
+
+        for (size_t i = 0; i < loops; i++, d+= S) {
+            DEBUG_PRINTF("d %p \n", d);
+            const u8 *base = ROUNDUP_PTR(d, 64);
+            // On large packet buffers, this prefetch appears to get us about 2%.
+            __builtin_prefetch(base + 256);
+
+            SuperVector<S> v = SuperVector<S>::load(d) & caseMask;
+            typename SuperVector<S>::movemask_type z1 = mask1.eqmask(v);
+            typename SuperVector<S>::movemask_type z2 = mask2.eqmask(v);
+            typename SuperVector<S>::movemask_type z = (z1 << 1 | lastz1) & z2;
+            lastz1 = z1 >> Z_SHIFT;
+
+            hwlm_error_t rv = double_zscan(n, d, buf, z, len, cbi);
+            RETURN_IF_TERMINATED(rv);
+        }
     }
 
-    uintptr_t data = (uintptr_t)buf;
-    uintptr_t s2Start = ROUNDUP_N(data + offset, S) - data;
-    uintptr_t s1End = s2Start + 1;
-    uintptr_t off = offset;
+    DEBUG_PRINTF("d %p e %p \n", d, e);
+    // finish off tail
 
-    if (s2Start != off) {
-        // first scan out to the fast scan starting point plus one char past to
-        // catch the key on the overlap
-        DEBUG_PRINTF("stage 1: %zu -> %zu\n", off, s2Start);
-        rv = scanDoubleUnaligned2(n, buf, caseMask, mask1, mask2, cbi, len, offset, off, s1End);
-        //rv = scanDoubleUnaligned(n, buf, len, offset, caseMask.u.v512[0], mask1.u.v512[0], mask2.u.v512[0], cbi, off, s1End);
-        RETURN_IF_TERMINATED(rv);
-    }
-    off = s1End;
-    uintptr_t last = data + end;
-    uintptr_t s2End = ROUNDDOWN_N(last, S) - data;
-    uintptr_t s3Start = end - S;
-
-    if (s2Start >= end) {
-        DEBUG_PRINTF("s2 == mL %zu\n", end);
-        return HWLM_SUCCESS;
-    }
-
-    //size_t loops = (s2End -s2Start)/ S;
-
-    if (likely(s2Start != s2End)) {
-    //if (likely(loops)) {
-        // scan as far as we can, bounded by the last point this key can
-        // possibly match
-        DEBUG_PRINTF("fast: ~ %zu -> %zu\n", s2Start, s3Start);
-        rv = scanDoubleFast2(n, buf, len, caseMask, mask1, mask2, cbi, s2Start, s2End);
-        //rv = scanDoubleFast(n, buf, len, caseMask.u.v512[0], mask1.u.v512[0], mask2.u.v512[0], cbi, s2Start, s2End);
-        RETURN_IF_TERMINATED(rv);
-        off = s2End;
-    }
-
-    // if there isn't enough data left to match the key, bail out
-    if (s2End == end) {
-        return HWLM_SUCCESS;
-    }
-
-    DEBUG_PRINTF("stage 3: %zu -> %zu\n", s3Start, end);
-    rv = scanDoubleUnaligned2(n, buf, caseMask, mask1, mask2, cbi, len, s3Start, off, end);
-    //rv = scanDoubleUnaligned(n, buf, len, s3Start, caseMask.u.v512[0], mask1.u.v512[0], mask2.u.v512[0], cbi, off, end);
-
-    return rv;
+    return scanDoubleUnaligned(n, buf, caseMask, mask1, mask2, &lastz1, cbi, len, d - buf, end);
 }
 
 // Single-character specialisation, used when keyLen = 1
