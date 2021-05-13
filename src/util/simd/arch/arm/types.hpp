@@ -1,5 +1,6 @@
 /*
- * Copyright (c) 2017-2020, Intel Corporation
+ * Copyright (c) 2015-2017, Intel Corporation
+ * Copyright (c) 2020-2021, VectorCamp PC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -26,19 +27,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-/** \file
- * \brief Per-platform architecture definitions
- */
-
-#ifndef UTIL_ARCH_ARM_H_
-#define UTIL_ARCH_ARM_H_
-
-#if defined(__ARM_NEON) && (defined(ARCH_ARM32) || defined(ARCH_AARCH64))
-#define HAVE_NEON
-#define HAVE_SIMD_128_BITS
-#define CHUNKSIZE 128
-#define VECTORSIZE 16
+#if !defined(m128) && defined(HAVE_NEON)
+typedef int32x4_t m128;
 #endif
-
-#endif // UTIL_ARCH_ARM_H_
 
