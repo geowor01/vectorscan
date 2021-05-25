@@ -59,14 +59,16 @@ struct cb_info {
 };
 
 
-#include "noodle_engine_simd.hpp"
-
 #define RETURN_IF_TERMINATED(x)                                                \
     {                                                                          \
         if ((x) == HWLM_TERMINATED) {                                          \
             return HWLM_TERMINATED;                                            \
         }                                                                      \
     }
+
+#if !defined(HAVE_SVE)
+#include "noodle_engine_simd.hpp"
+#endif
 
 // Make sure the rest of the string is there. The single character scanner
 // is used only for single chars with case insensitivity used correctly,
@@ -122,130 +124,6 @@ hwlm_error_t double_zscan(const struct noodTable *n,const u8 *d, const u8 *buf,
         RETURN_IF_TERMINATED(rv);
     }
     return HWLM_SUCCESS;
-}
-
-template <uint16_t S>
-static really_inline
-hwlm_error_t scanSingleMain(const struct noodTable *n, const u8 *buf,
-                            size_t len, size_t offset,
-                            SuperVector<S> caseMask, SuperVector<S> mask1,
-                            const struct cb_info *cbi) {
-    size_t start = offset + n->msk_len - 1;
-    size_t end = len;
-
-    const u8 *d = buf + start;
-    const u8 *e = buf + end;
-    DEBUG_PRINTF("start %p end %p \n", d, e);
-    assert(d < e);
-    if (d + S <= e) {
-        // peel off first part to cacheline boundary
-        const u8 *d1 = ROUNDUP_PTR(d, S);
-        DEBUG_PRINTF("until aligned %p \n", d1);
-        if (scanSingleUnaligned(n, buf, caseMask, mask1, cbi, len, start, d1 - buf) == HWLM_TERMINATED) {
-            return HWLM_TERMINATED;
-        }
-        d = d1;
-
-        size_t loops = (end - (d - buf)) / S;
-        DEBUG_PRINTF("loops %ld \n", loops);
-
-        for (size_t i = 0; i < loops; i++, d+= S) {
-            DEBUG_PRINTF("d %p \n", d);
-            const u8 *base = ROUNDUP_PTR(d, 64);
-            // On large packet buffers, this prefetch appears to get us about 2%.
-            __builtin_prefetch(base + 256);
-
-            SuperVector<S> v = SuperVector<S>::load(d) & caseMask;
-            typename SuperVector<S>::movemask_type z = mask1.eqmask(v);
-
-            hwlm_error_t rv = single_zscan(n, d, buf, z, len, cbi);
-            RETURN_IF_TERMINATED(rv);
-        }
-    }
-
-    DEBUG_PRINTF("d %p e %p \n", d, e);
-    // finish off tail
-
-    return scanSingleUnaligned(n, buf, caseMask, mask1, cbi, len, d - buf, end);
-}
-
-template <uint16_t S>
-static really_inline
-hwlm_error_t scanDoubleMain(const struct noodTable *n, const u8 *buf,
-                            size_t len, size_t offset, 
-                            SuperVector<S> caseMask, SuperVector<S> mask1, SuperVector<S> mask2,
-                            const struct cb_info *cbi) {
-    // we stop scanning for the key-fragment when the rest of the key can't
-    // possibly fit in the remaining buffer
-    size_t end = len - n->key_offset + 2;
-
-    size_t start = offset + n->msk_len - n->key_offset;
-
-    typename SuperVector<S>::movemask_type lastz1{0};
-
-    const u8 *d = buf + start;
-    const u8 *e = buf + end;
-    DEBUG_PRINTF("start %p end %p \n", d, e);
-    assert(d < e);
-    if (d + S <= e) {
-        // peel off first part to cacheline boundary
-        const u8 *d1 = ROUNDUP_PTR(d, S);
-        DEBUG_PRINTF("until aligned %p \n", d1);
-        if (scanDoubleUnaligned(n, buf, caseMask, mask1, mask2, &lastz1, cbi, len, start, d1 - buf) == HWLM_TERMINATED) {
-            return HWLM_TERMINATED;
-        }
-        d = d1;
-
-        size_t loops = (end - (d - buf)) / S;
-        DEBUG_PRINTF("loops %ld \n", loops);
-
-        for (size_t i = 0; i < loops; i++, d+= S) {
-            DEBUG_PRINTF("d %p \n", d);
-            const u8 *base = ROUNDUP_PTR(d, 64);
-            // On large packet buffers, this prefetch appears to get us about 2%.
-            __builtin_prefetch(base + 256);
-
-            SuperVector<S> v = SuperVector<S>::load(d) & caseMask;
-            typename SuperVector<S>::movemask_type z1 = mask1.eqmask(v);
-            typename SuperVector<S>::movemask_type z2 = mask2.eqmask(v);
-            typename SuperVector<S>::movemask_type z = (z1 << 1 | lastz1) & z2;
-            lastz1 = z1 >> Z_SHIFT;
-
-            hwlm_error_t rv = double_zscan(n, d, buf, z, len, cbi);
-            RETURN_IF_TERMINATED(rv);
-        }
-    }
-
-    DEBUG_PRINTF("d %p e %p \n", d, e);
-    // finish off tail
-
-    return scanDoubleUnaligned(n, buf, caseMask, mask1, mask2, &lastz1, cbi, len, d - buf, end);
-}
-
-// Single-character specialisation, used when keyLen = 1
-static really_inline
-hwlm_error_t scanSingle(const struct noodTable *n, const u8 *buf, size_t len,
-                        size_t start, bool noCase, const struct cb_info *cbi) {
-    if (!ourisalpha(n->key0)) {
-        noCase = 0; // force noCase off if we don't have an alphabetic char
-    }
-
-    const SuperVector<VECTORSIZE> caseMask{noCase ? getCaseMask<VECTORSIZE>() : SuperVector<VECTORSIZE>::Ones()};
-    const SuperVector<VECTORSIZE> mask1{getMask<VECTORSIZE>(n->key0, noCase)};
-
-    return scanSingleMain(n, buf, len, start, caseMask, mask1, cbi);
-}
-
-
-static really_inline
-hwlm_error_t scanDouble(const struct noodTable *n, const u8 *buf, size_t len,
-                        size_t start, bool noCase, const struct cb_info *cbi) {
-
-    const SuperVector<VECTORSIZE> caseMask{noCase ? getCaseMask<VECTORSIZE>() : SuperVector<VECTORSIZE>::Ones()};
-    const SuperVector<VECTORSIZE> mask1{getMask<VECTORSIZE>(n->key0, noCase)};
-    const SuperVector<VECTORSIZE> mask2{getMask<VECTORSIZE>(n->key1, noCase)};
-
-    return scanDoubleMain(n, buf, len, start, caseMask, mask1, mask2, cbi);
 }
 
 // main entry point for the scan code
