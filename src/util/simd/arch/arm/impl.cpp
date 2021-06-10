@@ -31,16 +31,8 @@
 #define SIMD_IMPL_HPP
 
 #include <cstdint>
-#include <cstdio>
 
-#include "ue2common.h"
-#include "util/arch.h"
-#include "util/unaligned.h"
-#include "util/simd/types.hpp"
-
-#if !defined(m128) && defined(HAVE_NEON)
-typedef int32x4_t m128;
-#endif
+#include "util/simd/arch/arm/types.hpp"
 
 // 128-bit NEON implementation
 
@@ -125,8 +117,6 @@ really_inline SuperVector<16>::SuperVector<uint64_t>(uint64_t const o)
 {
 	u.v128[0] = vdupq_n_u64(o);
 }
-
-
 
 // Constants
 template<>

@@ -159,6 +159,12 @@ really_inline SuperVector<16> SuperVector<16>::operator&(SuperVector<16> const b
 }
 
 template <>
+really_inline SuperVector<16> SuperVector<16>::operator|(SuperVector<16> const b) const
+{
+    return {_mm_or_si128(u.v128[0], b.u.v128[0])};
+}
+
+template <>
 really_inline SuperVector<16> SuperVector<16>::mand(SuperVector<16> const b) const
 {
     return *this & b;
