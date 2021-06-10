@@ -691,7 +691,7 @@ set (hs_exec_SRCS
     src/nfa/sheng_impl.h
     src/nfa/sheng_impl4.h
     src/nfa/sheng_internal.h
-    src/nfa/shufti.c
+    src/nfa/shufti.cpp
     src/nfa/shufti.h
     src/nfa/tamarama.c
     src/nfa/tamarama.h
@@ -752,6 +752,18 @@ set (hs_exec_SRCS
     src/database.c
     src/database.h
 )
+
+if (NOT OPTIMISE)
+if (ARCH_IA32 OR ARCH_X86_64)
+set (hs_exec_SRCS
+    ${hs_exec_SRCS}
+    src/util/simd/arch/x86/impl.cpp)
+else (ARCH_ARM32 OR ARCH_AARCH64)
+set (hs_exec_SRCS
+    ${hs_exec_SRCS}
+    src/util/simd/arch/arm/impl.cpp)
+endif ()
+endif()
 
 set (hs_exec_avx2_SRCS
     src/fdr/teddy_avx2.c
