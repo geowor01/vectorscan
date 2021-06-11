@@ -602,7 +602,7 @@ set (hs_exec_common_SRCS
     ${hs_exec_common_SRCS}
     src/util/arch/x86/cpuid_flags.c
     )
-else (ARCH_ARM32 OR ARCH_AARCH64)
+elseif (ARCH_ARM32 OR ARCH_AARCH64)
 set (hs_exec_common_SRCS
     ${hs_exec_common_SRCS}
     src/util/arch/arm/cpuid_flags.c
@@ -758,7 +758,7 @@ if (ARCH_IA32 OR ARCH_X86_64)
 set (hs_exec_SRCS
     ${hs_exec_SRCS}
     src/util/simd/arch/x86/impl.cpp)
-else (ARCH_ARM32 OR ARCH_AARCH64)
+elseif (ARCH_ARM32 OR ARCH_AARCH64)
 set (hs_exec_SRCS
     ${hs_exec_SRCS}
     src/util/simd/arch/arm/impl.cpp)
