@@ -266,14 +266,14 @@ TEST(SuperVectorUtilsTest,pshufbc) {
 }
 
 /*Define ALIGNR128 macro*/
-#define TEST_ALIGNR128(v1, v2, buf, l) {                                                    \
-                                           auto v_aligned = v2.alignr(v1,l);                \
-                                           printv_u8("v1", v1);                        \
-                                           printv_u8("v2", v2);                        \
-                                           printv_u8("v_aligned", v_aligned);          \
-                                           for (size_t i=0; i<16; i++) {                    \
-                                               ASSERT_EQ(v_aligned.u.u8[i], vec[16 -l +i]); \
-                                           }                                                \
+#define TEST_ALIGNR128(v1, v2, buf, l) {                                                     \
+                                           auto v_aligned = v2.alignr(v1,l);                 \
+                                           printv_u8("v1", v1);                              \
+                                           printv_u8("v2", v2);                              \
+                                           printv_u8("v_aligned", v_aligned);                \
+                                           for (size_t i=0; i<16; i++) {                     \
+                                               ASSERT_EQ(v_aligned.u.u8[i], vec[16 -l + i]); \
+                                           }                                                 \
                                        }
 
 TEST(SuperVectorUtilsTest,Alignr128c){
