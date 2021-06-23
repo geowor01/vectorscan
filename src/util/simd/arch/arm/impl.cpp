@@ -148,7 +148,7 @@ really_inline SuperVector<16> SuperVector<16>::operator&(SuperVector<16> const b
 template <>
 really_inline SuperVector<16> SuperVector<16>::operator|(SuperVector<16> const b) const
 {
-    return {vandq_s8(u.v128[0], b.u.v128[0])};
+    return {vorrq_s8(u.v128[0], b.u.v128[0])};
 }
 
 template <>
@@ -193,31 +193,31 @@ really_inline typename SuperVector<16>::movemask_type SuperVector<16>::eqmask(Su
 
 #ifndef HS_OPTIMIZE
 template <>
-really_inline SuperVector<16> SuperVector<16>::operator<<(uint8_t const N) const
+really_inline SuperVector<16> SuperVector<16>::operator>>(uint8_t const N) const
 {
-	return {vshlq_n_s32(u.v128[0], N)};
+    return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), N)};
 }
 #else
 template <>
-really_inline SuperVector<16> SuperVector<16>::operator<<(uint8_t const N) const
+really_inline SuperVector<16> SuperVector<16>::operator>>(uint8_t const N) const
 {
 	switch(N) {
 	case 0: return *this; break;
-	case 1: return {vshlq_n_s32((int16x8_t) u.v128[0], 1)}; break;
-	case 2: return {vshlq_n_s32((int16x8_t) u.v128[0], 2)}; break;
-	case 3: return {vshlq_n_s32((int16x8_t) u.v128[0], 3)}; break;
-	case 4: return {vshlq_n_s32((int16x8_t) u.v128[0], 4)}; break;
-	case 5: return {vshlq_n_s32((int16x8_t) u.v128[0], 5)}; break;
-	case 6: return {vshlq_n_s32((int16x8_t) u.v128[0], 6)}; break;
-	case 7: return {vshlq_n_s32((int16x8_t) u.v128[0], 7)}; break;
-	case 8: return {vshlq_n_s32((int16x8_t) u.v128[0], 8)}; break;
-	case 9: return {vshlq_n_s32((int16x8_t) u.v128[0], 9)}; break;
-	case 10: return {vshlq_n_s32((int16x8_t) u.v128[0], 10)}; break;
-	case 11: return {vshlq_n_s32((int16x8_t) u.v128[0], 11)}; break;
-	case 12: return {vshlq_n_s32((int16x8_t) u.v128[0], 12)}; break;
-	case 13: return {vshlq_n_s32((int16x8_t) u.v128[0], 13)}; break;
-	case 14: return {vshlq_n_s32((int16x8_t) u.v128[0], 14)}; break;
-	case 15: return {vshlq_n_s32((int16x8_t) u.v128[0], 15)}; break;
+        case 1: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 1)}; break;
+        case 2: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 2)}; break;
+        case 3: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 3)}; break;
+        case 4: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 4)}; break;
+        case 5: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 5)}; break;
+        case 6: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 6)}; break;
+        case 7: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 7)}; break;
+        case 8: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 8)}; break;
+        case 9: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 9)}; break;
+        case 10: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 10)}; break;
+        case 11: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 11)}; break;
+        case 12: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 12)}; break;
+        case 13: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 13)}; break;
+        case 14: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 14)}; break;
+        case 15: return {vextq_s8((int16x8_t)u.v128[0], vdupq_n_u8(0), 15)}; break;
 	case 16: return Zeroes(); break;
 	default: break;
 	}
@@ -225,33 +225,34 @@ really_inline SuperVector<16> SuperVector<16>::operator<<(uint8_t const N) const
 }
 #endif
 
-#ifdef HS_OPTIMIZE
+#ifndef HS_OPTIMIZE
 template <>
-really_inline SuperVector<16> SuperVector<16>::operator>>(uint8_t const N) const
+really_inline SuperVector<16> SuperVector<16>::operator<<(uint8_t const N) const
 {
-	return {vshrq_n_s32(u.v128[0], N)};
+    return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 16 - N)};
 }
 #else
 template <>
-really_inline SuperVector<16> SuperVector<16>::operator>>(uint8_t const N) const
+really_inline SuperVector<16> SuperVector<16>::operator<<(uint8_t const N) const
 {
 	switch(N) {
-	case 0: return {vshrq_n_s32(u.v128[0], 0)}; break;
-	case 1: return {vshrq_n_s32(u.v128[0], 1)}; break;
-	case 2: return {vshrq_n_s32(u.v128[0], 2)}; break;
-	case 3: return {vshrq_n_s32(u.v128[0], 3)}; break;
-	case 4: return {vshrq_n_s32(u.v128[0], 4)}; break;
-	case 5: return {vshrq_n_s32(u.v128[0], 5)}; break;
-	case 6: return {vshrq_n_s32(u.v128[0], 6)}; break;
-	case 7: return {vshrq_n_s32(u.v128[0], 7)}; break;
-	case 8: return {vshrq_n_s32(u.v128[0], 8)}; break;
-	case 9: return {vshrq_n_s32(u.v128[0], 9)}; break;
-	case 10: return {vshrq_n_s32(u.v128[0], 10)}; break;
-	case 11: return {vshrq_n_s32(u.v128[0], 11)}; break;
-	case 12: return {vshrq_n_s32(u.v128[0], 12)}; break;
-	case 13: return {vshrq_n_s32(u.v128[0], 13)}; break;
-	case 14: return {vshrq_n_s32(u.v128[0], 14)}; break;
-	case 15: return {vshrq_n_s32(u.v128[0], 15)}; break;
+	case 0: return *this; break;
+        case 1: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 15)}; break;
+        case 2: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 14)}; break;
+        case 3: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 13)}; break;
+        case 4: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 12)}; break;
+        case 5: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 11)}; break;
+        case 6: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 10)}; break;
+        case 7: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 9)}; break;
+        case 8: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 8)}; break;
+        case 9: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 7)}; break;
+        case 10: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 6)}; break;
+        case 11: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 5)}; break;
+        case 12: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 4)}; break;
+        case 13: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 3)}; break;
+        case 14: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 2)}; break;
+        case 15: return {vextq_s8(vdupq_n_u8(0), (int16x8_t)u.v128[0], 1)}; break;
+	case 16: return Zeroes(); break;
 	default: break;
 	}
 	return *this;
@@ -286,30 +287,30 @@ really_inline SuperVector<16> SuperVector<16>::loadu_maskz(void const *ptr, uint
 template<>
 really_inline SuperVector<16> SuperVector<16>::alignr(SuperVector<16> r, int8_t offset)
 {
-    return {vextq_s8((int16x8_t)u.v128[0], (int16x8_t)r.u.v128[0], offset)};
+    return {vextq_s8((int16x8_t)r.u.v128[0], (int16x8_t)u.v128[0], 16 - offset)};
 }
 #else
 template<>
-really_inline SuperVector<16> SuperVector<16>::alignr(SuperVector<16> l, int8_t offset)
+really_inline SuperVector<16> SuperVector<16>::alignr(SuperVector<16> r, int8_t offset)
 {
 	switch(offset) {
 	case 0: return *this; break;
-	case 1: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 1)}; break;
-	case 2: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 2)}; break;
-	case 3: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 3)}; break;
-	case 4: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 4)}; break;
-	case 5: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 5)}; break;
-	case 6: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 6)}; break;
-	case 7: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 7)}; break;
-	case 8: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 8)}; break;
-	case 9: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 9)}; break;
-	case 10: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 10)}; break;
-	case 11: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 11)}; break;
-	case 12: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 12)}; break;
-	case 13: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 13)}; break;
-	case 14: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 14)}; break;
-	case 15: return {vextq_s8((int16x8_t) u.v128[0], (int16x8_t) l.u.v128[0], 15)}; break;
-	case 16: return l; break;
+	case 1: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 15)}; break;
+	case 2: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 14)}; break;
+	case 3: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 13)}; break;
+	case 4: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 12)}; break;
+	case 5: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 11)}; break;
+	case 6: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 10)}; break;
+	case 7: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 9)}; break;
+	case 8: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 8)}; break;
+	case 9: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 7)}; break;
+	case 10: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 6)}; break;
+	case 11: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 5)}; break;
+	case 12: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 4)}; break;
+	case 13: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 3)}; break;
+	case 14: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 2)}; break;
+	case 15: return {vextq_s8((int16x8_t) r.u.v128[0], (int16x8_t) u.v128[0], 1)}; break;
+	case 16: return r; break;
 	default: break;
 	}
 	return *this;

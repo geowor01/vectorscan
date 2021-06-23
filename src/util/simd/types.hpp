@@ -31,6 +31,7 @@
 #define SIMD_TYPES_HPP
 
 #include <cstdint>
+#include <cstdio>
 
 #if defined(ARCH_IA32) || defined(ARCH_X86_64)
 #include "util/simd/arch/x86/types.hpp"
@@ -211,6 +212,39 @@ public:
 #include "util/simd/arch/arm/impl.cpp"
 #endif
 #endif
+
+
+template <uint16_t S>
+static void printv_u8(const char *label, SuperVector<S> &v) {
+    printf("%s: ", label);
+    for(int i=0; i < S; i++)
+        printf("%02x ", v.u.u8[i]);
+    printf("\n");
+}
+
+template <uint16_t S>
+static void printv_u16(const char *label, SuperVector<S> &v) {
+    printf("%s: ", label);
+    for(int i=0; i < S/sizeof(u16); i++)
+        printf("%04x ", v.u.u16[i]);
+    printf("\n");
+}
+
+template <uint16_t S>
+static void printv_u32(const char *label, SuperVector<S> &v) {
+    printf("%s: ", label);
+    for(int i=0; i < S/sizeof(u32); i++)
+        printf("%08x ", v.u.u32[i]);
+    printf("\n");
+}
+
+template <uint16_t S>
+static inline void printv_u64(const char *label, SuperVector<S> &v) {
+    printf("%s: ", label);
+    for(int i=0; i < S/sizeof(u64a); i++)
+        printf("%016lx ", v.u.u64[i]);
+    printf("\n");
+}
 
 
 #endif /* SIMD_TYPES_H */
