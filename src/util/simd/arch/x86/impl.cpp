@@ -205,7 +205,6 @@ template <>
 really_inline SuperVector<16> SuperVector<16>::operator<<(uint8_t const N) const
 {
 	switch(N) {
-	case 0: return {_mm_slli_si128(u.v128[0], 0)}; break;
 	case 1: return {_mm_slli_si128(u.v128[0], 1)}; break;
 	case 2: return {_mm_slli_si128(u.v128[0], 2)}; break;
 	case 3: return {_mm_slli_si128(u.v128[0], 3)}; break;
@@ -221,6 +220,7 @@ really_inline SuperVector<16> SuperVector<16>::operator<<(uint8_t const N) const
 	case 13: return {_mm_slli_si128(u.v128[0], 13)}; break;
 	case 14: return {_mm_slli_si128(u.v128[0], 14)}; break;
 	case 15: return {_mm_slli_si128(u.v128[0], 15)}; break;
+	case 16: return Zeroes(); break;
 	default: break;
 	}
 	return *this;
@@ -238,7 +238,6 @@ template <>
 really_inline SuperVector<16> SuperVector<16>::operator>>(uint8_t const N) const
 {
 	switch(N) {
-	case 0: return {_mm_srli_si128(u.v128[0], 0)}; break;
 	case 1: return {_mm_srli_si128(u.v128[0], 1)}; break;
 	case 2: return {_mm_srli_si128(u.v128[0], 2)}; break;
 	case 3: return {_mm_srli_si128(u.v128[0], 3)}; break;
@@ -254,6 +253,7 @@ really_inline SuperVector<16> SuperVector<16>::operator>>(uint8_t const N) const
 	case 13: return {_mm_srli_si128(u.v128[0], 13)}; break;
 	case 14: return {_mm_srli_si128(u.v128[0], 14)}; break;
 	case 15: return {_mm_srli_si128(u.v128[0], 15)}; break;
+	case 16: return Zeroes(); break;
 	default: break;
 	}
 	return *this;
@@ -299,22 +299,23 @@ template<>
 really_inline SuperVector<16> SuperVector<16>::alignr(SuperVector<16> l, int8_t offset)
 {
 	switch(offset) {
-	case 0: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 0)};; break;
-	case 1: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 1)}; break;
-	case 2: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 2)}; break;
-	case 3: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 3)}; break;
-	case 4: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 4)}; break;
-	case 5: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 5)}; break;
-	case 6: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 6)}; break;
-	case 7: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 7)}; break;
+	case 0: return *this; break;
+	case 1: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 15)}; break;
+	case 2: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 14)}; break;
+	case 3: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 13)}; break;
+	case 4: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 12)}; break;
+	case 5: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 11)}; break;
+	case 6: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 10)}; break;
+	case 7: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 9)}; break;
 	case 8: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 8)}; break;
-	case 9: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 9)}; break;
-	case 10: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 10)}; break;
-	case 11: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 11)}; break;
-	case 12: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 12)}; break;
-	case 13: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 13)}; break;
-	case 14: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 14)}; break;
-	case 15: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 15)}; break;
+	case 9: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 7)}; break;
+	case 10: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 6)}; break;
+	case 11: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 5)}; break;
+	case 12: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 4)}; break;
+	case 13: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 3)}; break;
+	case 14: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 2)}; break;
+	case 15: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 1)}; break;
+	case 16: return l; break;
 	default: break;
 	}
 	return *this;
@@ -338,7 +339,7 @@ template<>
 really_inline SuperVector<16> SuperVector<16>::lshift64(uint8_t const l)
 {
 	switch(l) {
-	case 0: return {_mm_slli_epi64(u.v128[0], 0)}; break;
+	case 0: return *this; break;
 	case 1: return {_mm_slli_epi64(u.v128[0], 1)}; break;
 	case 2: return {_mm_slli_epi64(u.v128[0], 2)}; break;
 	case 3: return {_mm_slli_epi64(u.v128[0], 3)}; break;
