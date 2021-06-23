@@ -327,7 +327,7 @@ really_inline SuperVector<16> SuperVector<16>::pshufb(SuperVector<16> b)
 	return {_mm_shuffle_epi8(u.v128[0], b.u.v128[0])};
 }
 
-#ifdef HS_HS_OPTIMIZE
+#ifdef HS_OPTIMIZE
 template<>
 really_inline SuperVector<16> SuperVector<16>::lshift64(uint8_t const l)
 {
