@@ -182,7 +182,7 @@ else()
         string(REGEX REPLACE "-O[^ ]*" "" CMAKE_CXX_FLAGS_${CONFIG} "${CMAKE_CXX_FLAGS_${CONFIG}}")
     endforeach ()
 
-    if (ARCH_IA32 OR ARCH_X86_64 AND CMAKE_COMPILER_IS_GNUCC)
+    if (CMAKE_COMPILER_IS_GNUCC)
         message(STATUS "gcc version ${CMAKE_C_COMPILER_VERSION}")
         # If gcc doesn't recognise the host cpu, then mtune=native becomes
         # generic, which isn't very good in some cases. march=native looks at
@@ -199,16 +199,20 @@ else()
         string(REGEX REPLACE "march=[ \t]*([^ \n]*)[ \n].*" "\\1"
             GNUCC_ARCH "${_GCC_OUTPUT}")
 
-        # test the parsed flag
-        set (EXEC_ARGS ${CC_ARG1} -E - -mtune=${GNUCC_ARCH})
-        execute_process(COMMAND ${CMAKE_C_COMPILER} ${EXEC_ARGS}
-            OUTPUT_QUIET ERROR_QUIET
-            INPUT_FILE /dev/null
-            RESULT_VARIABLE GNUCC_TUNE_TEST)
-        if (NOT GNUCC_TUNE_TEST EQUAL 0)
-            message(SEND_ERROR "Something went wrong determining gcc tune: -mtune=${GNUCC_ARCH} not valid")
+        if (ARCH_IA32 OR ARCH_X86_64)
+            # test the parsed flag
+            set (EXEC_ARGS ${CC_ARG1} -E - -mtune=${GNUCC_ARCH})
+            execute_process(COMMAND ${CMAKE_C_COMPILER} ${EXEC_ARGS}
+                OUTPUT_QUIET ERROR_QUIET
+                INPUT_FILE /dev/null
+                RESULT_VARIABLE GNUCC_TUNE_TEST)
+            if (NOT GNUCC_TUNE_TEST EQUAL 0)
+                message(SEND_ERROR "Something went wrong determining gcc tune: -mtune=${GNUCC_ARCH} not valid")
+            endif()
+            set(TUNE_FLAG ${GNUCC_ARCH})
+        else()
+            set(TUNE_FLAG native)
         endif()
-        set(TUNE_FLAG ${GNUCC_ARCH})
     elseif (NOT TUNE_FLAG)
         set(TUNE_FLAG native)
     endif()
