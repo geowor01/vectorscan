@@ -27,8 +27,8 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#ifndef SIMD_TYPES_HPP
-#define SIMD_TYPES_HPP
+#ifndef SUPERVECTOR_HPP
+#define SUPERVECTOR_HPP
 
 #include <cstdint>
 #include <cstdio>
@@ -209,15 +209,7 @@ public:
 // class SuperVector<64>;
 // class SuperVector<128>;
 
-#if defined(HS_OPTIMIZE)
-#if defined(ARCH_IA32) || defined(ARCH_X86_64)
-#include "util/supervector/arch/x86/impl.cpp"
-#elif defined(ARCH_ARM32) || defined(ARCH_AARCH64)
-#include "util/supervector/arch/arm/impl.cpp"
-#endif
-#endif
-
-
+#if defined(DEBUG)
 template <uint16_t S>
 static void printv_u8(const char *label, SuperVector<S> const &v) {
     printf("%s: ", label);
@@ -249,7 +241,20 @@ static inline void printv_u64(const char *label, SuperVector<S> const &v) {
         printf("%016lx ", v.u.u64[i]);
     printf("\n");
 }
+#else
+#define printv_u8(a, b)   ;
+#define printv_u16(a, b)  ;
+#define printv_u32(a, b)  ;
+#define printv_u64(a, b)  ;
+#endif
 
+#if defined(HS_OPTIMIZE)
+#if defined(ARCH_IA32) || defined(ARCH_X86_64)
+#include "util/supervector/arch/x86/impl.cpp"
+#elif defined(ARCH_ARM32) || defined(ARCH_AARCH64)
+#include "util/supervector/arch/arm/impl.cpp"
+#endif
+#endif
 
-#endif /* SIMD_TYPES_H */
+#endif /* SUPERVECTOR_H */
 

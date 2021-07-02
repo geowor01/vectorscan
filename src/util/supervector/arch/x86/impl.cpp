@@ -36,37 +36,14 @@
 #include "ue2common.h"
 #include "util/arch.h"
 #include "util/unaligned.h"
-#include "util/supervector/arch/arm/types.hpp"
-
-#if !defined(m128) && defined(HAVE_SSE2)
-typedef __m128i m128;
-#endif
-
-#if !defined(m256) && defined(HAVE_AVX2)
-typedef __m256i m256;
-#endif
-
-#if !defined(m512) && defined(HAVE_AVX512)
-typedef __m512i m512;
-#endif
-
-#ifdef DEBUG
-static inline void print_m128_16x8(const char *label, m128 vector) {
-    uint8_t ALIGN_ATTR(16) data[16];
-    _mm_store_si128 ((m128 *)data, vector);
-    DEBUG_PRINTF("%s: ", label);
-    for(int i=0; i < 16; i++)
-        printf("%02x ", data[i]);
-    printf("\n");
-}
-#endif
+#include "util/supervector/arch/x86/types.hpp"
 
 // 128-bit SSE implementation
 
 template<>
-really_inline SuperVector<16>::SuperVector(SuperVector const &o)
+really_inline SuperVector<16>::SuperVector(SuperVector const &other)
 {
-	u.v128[0] = o.u.v128[0];
+	u.v128[0] = other.u.v128[0];
 }
 
 template<>
@@ -77,58 +54,58 @@ really_inline SuperVector<16>::SuperVector(typename base_type::type const v)
 
 template<>
 template<>
-really_inline SuperVector<16>::SuperVector<int8_t>(int8_t const o)
+really_inline SuperVector<16>::SuperVector<int8_t>(int8_t const other)
 {
-	u.v128[0] = _mm_set1_epi8(o);
+	u.v128[0] = _mm_set1_epi8(other);
 }
 
 template<>
 template<>
-really_inline SuperVector<16>::SuperVector<uint8_t>(uint8_t const o)
+really_inline SuperVector<16>::SuperVector<uint8_t>(uint8_t const other)
 {
-	u.v128[0] = _mm_set1_epi8(static_cast<int8_t>(o));
+	u.v128[0] = _mm_set1_epi8(static_cast<int8_t>(other));
 }
 
 template<>
 template<>
-really_inline SuperVector<16>::SuperVector<int16_t>(int16_t const o)
+really_inline SuperVector<16>::SuperVector<int16_t>(int16_t const other)
 {
-	u.v128[0] = _mm_set1_epi16(o);
+	u.v128[0] = _mm_set1_epi16(other);
 }
 
 template<>
 template<>
-really_inline SuperVector<16>::SuperVector<uint16_t>(uint16_t const o)
+really_inline SuperVector<16>::SuperVector<uint16_t>(uint16_t const other)
 {
-	u.v128[0] = _mm_set1_epi16(static_cast<int16_t>(o));
+	u.v128[0] = _mm_set1_epi16(static_cast<int16_t>(other));
 }
 
 template<>
 template<>
-really_inline SuperVector<16>::SuperVector<int32_t>(int32_t const o)
+really_inline SuperVector<16>::SuperVector<int32_t>(int32_t const other)
 {
-	u.v128[0] = _mm_set1_epi32(o);
+	u.v128[0] = _mm_set1_epi32(other);
 }
 
 template<>
 template<>
-really_inline SuperVector<16>::SuperVector<uint32_t>(uint32_t const o)
+really_inline SuperVector<16>::SuperVector<uint32_t>(uint32_t const other)
 {
-	u.v128[0] = _mm_set1_epi32(static_cast<int32_t>(o));
+	u.v128[0] = _mm_set1_epi32(static_cast<int32_t>(other));
 }
 
 template<>
 template<>
-really_inline SuperVector<16>::SuperVector<int64_t>(int64_t const o)
+really_inline SuperVector<16>::SuperVector<int64_t>(int64_t const other)
 {
-	u.v128[0] = _mm_set1_epi64x(o);
+	u.v128[0] = _mm_set1_epi64x(other);
 }
 
 template<>
 template<>
-really_inline SuperVector<16>::SuperVector<uint64_t>(uint64_t const o)
+really_inline SuperVector<16>::SuperVector<uint64_t>(uint64_t const other)
 {
-	u.v128[0] = _mm_set1_epi64x(static_cast<int64_t>(o));
+	u.v128[0] = _mm_set1_epi64x(static_cast<int64_t>(other));
 }
 
 // Constants
@@ -147,39 +124,37 @@ really_inline SuperVector<16> SuperVector<16>::Zeroes(void)
 // Methods
 
 template <>
-really_inline void SuperVector<16>::operator=(SuperVector<16> const &o)
+really_inline void SuperVector<16>::operator=(SuperVector<16> const &other)
 {
-    u.v128[0] = o.u.v128[0];
+    u.v128[0] = other.u.v128[0];
 }
 
 template <>
-really_inline SuperVector<16> SuperVector<16>::operator&(SuperVector<16> const b) const
+really_inline SuperVector<16> SuperVector<16>::operator&(SuperVector<16> const &b) const
 {
     return {_mm_and_si128(u.v128[0], b.u.v128[0])};
 }
 
 template <>
-really_inline SuperVector<16> SuperVector<16>::operator|(SuperVector<16> const b) const
+really_inline SuperVector<16> SuperVector<16>::operator|(SuperVector<16> const &b) const
 {
     return {_mm_or_si128(u.v128[0], b.u.v128[0])};
 }
 
 template <>
-really_inline SuperVector<16> SuperVector<16>::operator^(SuperVector<16> const b) const
+really_inline SuperVector<16> SuperVector<16>::operator^(SuperVector<16> const &b) const
 {
     return {_mm_xor_si128(u.v128[0], b.u.v128[0])};
 }
 
-
 template <>
-really_inline SuperVector<16> SuperVector<16>::opandnot(SuperVector<16> const b) const
+really_inline SuperVector<16> SuperVector<16>::opandnot(SuperVector<16> const &b) const
 {
     return {_mm_andnot_si128(u.v128[0], b.u.v128[0])};
 }
 
-
 template <>
-really_inline SuperVector<16> SuperVector<16>::eq(SuperVector<16> const b) const
+really_inline SuperVector<16> SuperVector<16>::eq(SuperVector<16> const &b) const
 {
 	return {_mm_cmpeq_epi8(u.v128[0], b.u.v128[0])};
 }
@@ -198,67 +173,68 @@ really_inline typename SuperVector<16>::movemask_type SuperVector<16>::eqmask(Su
 
 #ifdef HS_OPTIMIZE
 template <>
-really_inline SuperVector<16> SuperVector<16>::operator<<(uint8_t const N) const
+really_inline SuperVector<16> SuperVector<16>::operator>>(uint8_t const N) const
 {
-	return {_mm_slli_si128(u.v128[0], N)};
+    return {_mm_srli_si128(u.v128[0], N)};
 }
 #else
 template <>
-really_inline SuperVector<16> SuperVector<16>::operator<<(uint8_t const N) const
+really_inline SuperVector<16> SuperVector<16>::operator>>(uint8_t const N) const
 {
-	switch(N) {
-	case 1: return {_mm_slli_si128(u.v128[0], 1)}; break;
-	case 2: return {_mm_slli_si128(u.v128[0], 2)}; break;
-	case 3: return {_mm_slli_si128(u.v128[0], 3)}; break;
-	case 4: return {_mm_slli_si128(u.v128[0], 4)}; break;
-	case 5: return {_mm_slli_si128(u.v128[0], 5)}; break;
-	case 6: return {_mm_slli_si128(u.v128[0], 6)}; break;
-	case 7: return {_mm_slli_si128(u.v128[0], 7)}; break;
-	case 8: return {_mm_slli_si128(u.v128[0], 8)}; break;
-	case 9: return {_mm_slli_si128(u.v128[0], 9)}; break;
-	case 10: return {_mm_slli_si128(u.v128[0], 10)}; break;
-	case 11: return {_mm_slli_si128(u.v128[0], 11)}; break;
-	case 12: return {_mm_slli_si128(u.v128[0], 12)}; break;
-	case 13: return {_mm_slli_si128(u.v128[0], 13)}; break;
-	case 14: return {_mm_slli_si128(u.v128[0], 14)}; break;
-	case 15: return {_mm_slli_si128(u.v128[0], 15)}; break;
-	case 16: return Zeroes(); break;
-	default: break;
-	}
-	return *this;
+    switch(N) {
+    case 0: return *this; break;
+    case 1: return {_mm_srli_si128(u.v128[0], 1)}; break;
+    case 2: return {_mm_srli_si128(u.v128[0], 2)}; break;
+    case 3: return {_mm_srli_si128(u.v128[0], 3)}; break;
+    case 4: return {_mm_srli_si128(u.v128[0], 4)}; break;
+    case 5: return {_mm_srli_si128(u.v128[0], 5)}; break;
+    case 6: return {_mm_srli_si128(u.v128[0], 6)}; break;
+    case 7: return {_mm_srli_si128(u.v128[0], 7)}; break;
+    case 8: return {_mm_srli_si128(u.v128[0], 8)}; break;
+    case 9: return {_mm_srli_si128(u.v128[0], 9)}; break;
+    case 10: return {_mm_srli_si128(u.v128[0], 10)}; break;
+    case 11: return {_mm_srli_si128(u.v128[0], 11)}; break;
+    case 12: return {_mm_srli_si128(u.v128[0], 12)}; break;
+    case 13: return {_mm_srli_si128(u.v128[0], 13)}; break;
+    case 14: return {_mm_srli_si128(u.v128[0], 14)}; break;
+    case 15: return {_mm_srli_si128(u.v128[0], 15)}; break;
+    case 16: return Zeroes(); break;
+    default: break;
+    }
+    return *this;
 }
 #endif
 
 #ifdef HS_OPTIMIZE
 template <>
-really_inline SuperVector<16> SuperVector<16>::operator>>(uint8_t const N) const
+really_inline SuperVector<16> SuperVector<16>::operator<<(uint8_t const N) const
 {
-	return {_mm_srli_si128(u.v128[0], N)};
+    return {_mm_slli_si128(u.v128[0], N)};
 }
 #else
 template <>
-really_inline SuperVector<16> SuperVector<16>::operator>>(uint8_t const N) const
+really_inline SuperVector<16> SuperVector<16>::operator<<(uint8_t const N) const
 {
-	switch(N) {
-	case 1: return {_mm_srli_si128(u.v128[0], 1)}; break;
-	case 2: return {_mm_srli_si128(u.v128[0], 2)}; break;
-	case 3: return {_mm_srli_si128(u.v128[0], 3)}; break;
-	case 4: return {_mm_srli_si128(u.v128[0], 4)}; break;
-	case 5: return {_mm_srli_si128(u.v128[0], 5)}; break;
-	case 6: return {_mm_srli_si128(u.v128[0], 6)}; break;
-	case 7: return {_mm_srli_si128(u.v128[0], 7)}; break;
-	case 8: return {_mm_srli_si128(u.v128[0], 8)}; break;
-	case 9: return {_mm_srli_si128(u.v128[0], 9)}; break;
-	case 10: return {_mm_srli_si128(u.v128[0], 10)}; break;
-	case 11: return {_mm_srli_si128(u.v128[0], 11)}; break;
-	case 12: return {_mm_srli_si128(u.v128[0], 12)}; break;
-	case 13: return {_mm_srli_si128(u.v128[0], 13)}; break;
-	case 14: return {_mm_srli_si128(u.v128[0], 14)}; break;
-	case 15: return {_mm_srli_si128(u.v128[0], 15)}; break;
-	case 16: return Zeroes(); break;
-	default: break;
-	}
-	return *this;
+    switch(N) {
+    case 1: return {_mm_slli_si128(u.v128[0], 1)}; break;
+    case 2: return {_mm_slli_si128(u.v128[0], 2)}; break;
+    case 3: return {_mm_slli_si128(u.v128[0], 3)}; break;
+    case 4: return {_mm_slli_si128(u.v128[0], 4)}; break;
+    case 5: return {_mm_slli_si128(u.v128[0], 5)}; break;
+    case 6: return {_mm_slli_si128(u.v128[0], 6)}; break;
+    case 7: return {_mm_slli_si128(u.v128[0], 7)}; break;
+    case 8: return {_mm_slli_si128(u.v128[0], 8)}; break;
+    case 9: return {_mm_slli_si128(u.v128[0], 9)}; break;
+    case 10: return {_mm_slli_si128(u.v128[0], 10)}; break;
+    case 11: return {_mm_slli_si128(u.v128[0], 11)}; break;
+    case 12: return {_mm_slli_si128(u.v128[0], 12)}; break;
+    case 13: return {_mm_slli_si128(u.v128[0], 13)}; break;
+    case 14: return {_mm_slli_si128(u.v128[0], 14)}; break;
+    case 15: return {_mm_slli_si128(u.v128[0], 15)}; break;
+    case 16: return Zeroes(); break;
+    default: break;
+    }
+    return *this;
 }
 #endif
 
@@ -283,40 +259,40 @@ really_inline SuperVector<16> SuperVector<16>::loadu_maskz(void const *ptr, uint
 	printf("alignment = %d\n", alignment);
 	SuperVector<16> maskb = Ones() << alignment;
 	SuperVector<16> maske = Ones() >> (16 -len - alignment);
-	print_m128_16x8("maskb", maskb.u.v128[0]);
-	print_m128_16x8("maske", maske.u.v128[0]);
+	printv_u8("maskb", maskb);
+	printv_u8("maske", maske);
 	SuperVector<16> v = _mm_loadu_si128((const m128 *)ptr);
-	print_m128_16x8("v", v.u.v128[0]);
+	printv_u8("v", v);
     return {maskb.u.v128[0] & maske.u.v128[0] & v.u.v128[0]};
 }
 
 #ifdef HS_OPTIMIZE
 template<>
-really_inline SuperVector<16> SuperVector<16>::alignr(SuperVector<16> l, int8_t offset)
+really_inline SuperVector<16> SuperVector<16>::alignr(SuperVector<16> &other, int8_t offset)
 {
-    return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], offset)};
+    return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], offset)};
 }
 #else
 template<>
-really_inline SuperVector<16> SuperVector<16>::alignr(SuperVector<16> l, int8_t offset)
+really_inline SuperVector<16> SuperVector<16>::alignr(SuperVector<16> &other, int8_t offset)
 {
 	switch(offset) {
 	case 0: return *this; break;
-	case 1: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 15)}; break;
-	case 2: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 14)}; break;
-	case 3: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 13)}; break;
-	case 4: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 12)}; break;
-	case 5: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 11)}; break;
-	case 6: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 10)}; break;
-	case 7: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 9)}; break;
-	case 8: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 8)}; break;
-	case 9: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 7)}; break;
-	case 10: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 6)}; break;
-	case 11: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 5)}; break;
-	case 12: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 4)}; break;
-	case 13: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 3)}; break;
-	case 14: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 2)}; break;
-	case 15: return {_mm_alignr_epi8(u.v128[0], l.u.v128[0], 1)}; break;
+	case 1: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 15)}; break;
+	case 2: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 14)}; break;
+	case 3: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 13)}; break;
+	case 4: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 12)}; break;
+	case 5: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 11)}; break;
+	case 6: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 10)}; break;
+	case 7: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 9)}; break;
+	case 8: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 8)}; break;
+	case 9: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 7)}; break;
+	case 10: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 6)}; break;
+	case 11: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 5)}; break;
+	case 12: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 4)}; break;
+	case 13: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 3)}; break;
+	case 14: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 2)}; break;
+	case 15: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 1)}; break;
 	case 16: return l; break;
 	default: break;
 	}
@@ -332,15 +308,15 @@ really_inline SuperVector<16> SuperVector<16>::pshufb(SuperVector<16> b)
 
 #ifdef HS_OPTIMIZE
 template<>
-really_inline SuperVector<16> SuperVector<16>::lshift64(uint8_t const l)
+really_inline SuperVector<16> SuperVector<16>::lshift64(uint8_t const N)
 {
-	return {_mm_slli_epi64(u.v128[0], l)};
+	return {_mm_slli_epi64(u.v128[0], N)};
 }
 #else
 template<>
-really_inline SuperVector<16> SuperVector<16>::lshift64(uint8_t const l)
+really_inline SuperVector<16> SuperVector<16>::lshift64(uint8_t const N)
 {
-	switch(l) {
+	switch(N) {
 	case 0: return *this; break;
 	case 1: return {_mm_slli_epi64(u.v128[0], 1)}; break;
 	case 2: return {_mm_slli_epi64(u.v128[0], 2)}; break;
@@ -363,17 +339,17 @@ really_inline SuperVector<16> SuperVector<16>::lshift64(uint8_t const l)
 }
 #endif
 
-#ifdef HS_HS_OPTIMIZE
+#ifdef HS_OPTIMIZE
 template<>
-really_inline SuperVector<16> SuperVector<16>::rshift64(uint8_t const l)
+really_inline SuperVector<16> SuperVector<16>::rshift64(uint8_t const N)
 {
-	return {_mm_srli_epi64(u.v128[0], l)};
+	return {_mm_srli_epi64(u.v128[0], N)};
 }
 #else
 template<>
-really_inline SuperVector<16> SuperVector<16>::rshift64(uint8_t const l)
+really_inline SuperVector<16> SuperVector<16>::rshift64(uint8_t const N)
 {
-	switch(l) {
+	switch(N) {
 	case 0: return {_mm_srli_epi64(u.v128[0], 0)}; break;
 	case 1: return {_mm_srli_epi64(u.v128[0], 1)}; break;
 	case 2: return {_mm_srli_epi64(u.v128[0], 2)}; break;
