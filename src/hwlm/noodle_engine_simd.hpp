@@ -29,7 +29,7 @@
 
 /* SIMD engine agnostic noodle scan parts */
 
-#include "util/simd/types.hpp"
+#include "util/supervector/supervector.hpp"
 
 static u8 CASEMASK[] = { 0xff, 0xdf };
 

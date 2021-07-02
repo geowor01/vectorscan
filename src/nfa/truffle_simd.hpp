@@ -38,7 +38,7 @@
 #include "util/bitutils.h"
 #include "util/unaligned.h"
 
-#include "util/simd/types.hpp"
+#include "util/supervector/supervector.hpp"
 
 
 template <uint16_t S>
@@ -115,18 +115,18 @@ static really_inline
 typename SuperVector<S>::movemask_type block(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S> shuf_mask_lo_highset,
             SuperVector<S> v){
 
-    SuperVector<S> highconst = SuperVector<S>::set1_16x8(0x80);           
-    print_m128_16x8("highconst", highconst.u.v128[0]);
+    SuperVector<S> highconst = SuperVector<S>::dup_u8(0x80);
+    printv_u8("highconst", highconst);
     
-    SuperVector<S> shuf_mask_hi = SuperVector<S>::set1_2x64(0x8040201008040201);
-    print_m128_2x64("shuf_mask_hi", shuf_mask_hi.u.v128[0]);
+    SuperVector<S> shuf_mask_hi = SuperVector<S>::dup_u64(0x8040201008040201);
+    printv_u64("shuf_mask_hi", shuf_mask_hi);
     
     SuperVector<S> shuf1 = shuf_mask_lo_highclear.pshufb(v);
     SuperVector<S> t1 = v ^ highconst;
     SuperVector<S> shuf2 = shuf_mask_lo_highset.pshufb(t1);
     SuperVector<S> t2 = highconst.opandnot(v.rshift64(4));
     SuperVector<S> shuf3 = shuf_mask_hi.pshufb(t2);
-    SuperVector<S> tmp = shuf3 & (shuf1 | shuf2);
+    SuperVector<S> tmp = (shuf1 | shuf2) & shuf3;
 
     return tmp.eqmask(SuperVector<S>::Zeroes());
 }

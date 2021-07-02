@@ -34,9 +34,9 @@
 #include <cstdio>
 
 #if defined(ARCH_IA32) || defined(ARCH_X86_64)
-#include "util/simd/arch/x86/types.hpp"
+#include "util/supervector/arch/x86/types.hpp"
 #elif defined(ARCH_ARM32) || defined(ARCH_AARCH64)
-#include "util/simd/arch/arm/types.hpp"
+#include "util/supervector/arch/arm/types.hpp"
 #endif
 
 #if defined(HAVE_SIMD_512_BITS)
@@ -54,7 +54,7 @@ using Z_TYPE = u32;
 #elif defined(HAVE_SIMD_128_BITS)
 using Z_TYPE = u32;
 #define Z_BITS 32
-#define Z_SHIFT 0
+#define Z_SHIFT 15
 #define DOUBLE_LOAD_MASK(l)        (((1ULL) << (l)) - 1ULL)
 #define SINGLE_LOAD_MASK(l)        (((1ULL) << (l)) - 1ULL)
 #endif
@@ -156,35 +156,35 @@ public:
     double   f64[SIZE / sizeof(double)];
   } u;
 
-  SuperVector(SuperVector const &o);
+  SuperVector(SuperVector const &other);
   SuperVector(typename base_type::type const v);
 
   template<typename T>
-  SuperVector(T const o);
+  SuperVector(T const other);
 
-  static SuperVector set1u_16x8(uint8_t o) { return {o}; };
-  static SuperVector set1_16x8(int8_t o) { return {o}; };
-  static SuperVector set1u_8x16(uint16_t o) { return {o}; };
-  static SuperVector set1_8x16(int16_t o) { return {o}; };
-  static SuperVector set1u_4x32(uint32_t o) { return {o}; };
-  static SuperVector set1_4x32(int32_t o) { return {o}; };
-  static SuperVector set1u_2x64(uint64_t o) { return {o}; };
-  static SuperVector set1_2x64(int64_t o) { return {o}; };
+  static SuperVector dup_u8 (uint8_t  other) { return {other}; };
+  static SuperVector dup_s8 (int8_t   other) { return {other}; };
+  static SuperVector dup_u16(uint16_t other) { return {other}; };
+  static SuperVector dup_s16(int16_t  other) { return {other}; };
+  static SuperVector dup_u32(uint32_t other) { return {other}; };
+  static SuperVector dup_s32(int32_t  other) { return {other}; };
+  static SuperVector dup_u64(uint64_t other) { return {other}; };
+  static SuperVector dup_s64(int64_t  other) { return {other}; };
 
-  void operator=(SuperVector const &o);
-
-  SuperVector operator&(SuperVector const b) const;
-  SuperVector operator|(SuperVector const b) const;
-  SuperVector operator^(SuperVector const b) const;
-
-  
-  SuperVector opand(SuperVector const b) const;
-  SuperVector opor(SuperVector const b) const;
-  SuperVector opandnot(SuperVector const b) const;
-  SuperVector opxor(SuperVector const b) const;
+  void operator=(SuperVector const &other);
 
 
-  SuperVector eq(SuperVector const b) const;
+
+  SuperVector operator&(SuperVector const &b) const;
+  SuperVector operator|(SuperVector const &b) const;
+  SuperVector operator^(SuperVector const &b) const;
+
+  SuperVector opand(SuperVector const &b) const { return *this & b; }
+  SuperVector opor (SuperVector const &b) const { return *this | b; }
+  SuperVector opxor(SuperVector const &b) const { return *this ^ b; }
+  SuperVector opandnot(SuperVector const &b) const;
+
+  SuperVector eq(SuperVector const &b) const;
   SuperVector operator<<(uint8_t const N) const;
   SuperVector operator>>(uint8_t const N) const;
   typename base_type::movemask_type movemask(void) const;
@@ -193,11 +193,11 @@ public:
   static SuperVector loadu(void const *ptr);
   static SuperVector load(void const *ptr);
   static SuperVector loadu_maskz(void const *ptr, uint8_t const len);
-  SuperVector alignr(SuperVector l, int8_t offset);
+  SuperVector alignr(SuperVector &other, int8_t offset);
 
   SuperVector pshufb(SuperVector b);
-  SuperVector lshift64(uint8_t const l);
-  SuperVector rshift64(uint8_t const l);
+  SuperVector lshift64(uint8_t const N);
+  SuperVector rshift64(uint8_t const N);
 
   // Constants
   static SuperVector Ones();
@@ -211,41 +211,41 @@ public:
 
 #if defined(HS_OPTIMIZE)
 #if defined(ARCH_IA32) || defined(ARCH_X86_64)
-#include "util/simd/arch/x86/impl.cpp"
+#include "util/supervector/arch/x86/impl.cpp"
 #elif defined(ARCH_ARM32) || defined(ARCH_AARCH64)
-#include "util/simd/arch/arm/impl.cpp"
+#include "util/supervector/arch/arm/impl.cpp"
 #endif
 #endif
 
 
 template <uint16_t S>
-static void printv_u8(const char *label, SuperVector<S> &v) {
+static void printv_u8(const char *label, SuperVector<S> const &v) {
     printf("%s: ", label);
-    for(int i=0; i < S; i++)
+    for(size_t i=0; i < S; i++)
         printf("%02x ", v.u.u8[i]);
     printf("\n");
 }
 
 template <uint16_t S>
-static void printv_u16(const char *label, SuperVector<S> &v) {
+static void printv_u16(const char *label, SuperVector<S> const &v) {
     printf("%s: ", label);
-    for(int i=0; i < S/sizeof(u16); i++)
+    for(size_t i=0; i < S/sizeof(u16); i++)
         printf("%04x ", v.u.u16[i]);
     printf("\n");
 }
 
 template <uint16_t S>
-static void printv_u32(const char *label, SuperVector<S> &v) {
+static void printv_u32(const char *label, SuperVector<S> const &v) {
     printf("%s: ", label);
-    for(int i=0; i < S/sizeof(u32); i++)
+    for(size_t i=0; i < S/sizeof(u32); i++)
         printf("%08x ", v.u.u32[i]);
     printf("\n");
 }
 
 template <uint16_t S>
-static inline void printv_u64(const char *label, SuperVector<S> &v) {
+static inline void printv_u64(const char *label, SuperVector<S> const &v) {
     printf("%s: ", label);
-    for(int i=0; i < S/sizeof(u64a); i++)
+    for(size_t i=0; i < S/sizeof(u64a); i++)
         printf("%016lx ", v.u.u64[i]);
     printf("\n");
 }

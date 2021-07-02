@@ -38,29 +38,26 @@
 #include "util/bitutils.h"
 #include "util/unaligned.h"
 
-#include "util/simd/types.hpp"
-
-#define GET1_LO_4(chars, low4bits) and128(chars, low4bits)
-#define GET1_HI_4(chars, low4bits) and128(rshift64_m128(chars, 4), low4bits)
+#include "util/supervector/supervector.hpp"
 
 template <uint16_t S>
 static really_inline
 typename SuperVector<S>::movemask_type block(SuperVector<S> mask_lo, SuperVector<S> mask_hi,
             SuperVector<S> chars, const SuperVector<S> low4bits) {
     SuperVector<S> c_lo = chars & low4bits;
-    print_m128_16x8("c_lo", c_lo.u.v128[0]);
+    //printv_u8("c_lo", c_lo);
     c_lo = mask_lo.pshufb(c_lo);
-    print_m128_16x8("c_lo", c_lo.u.v128[0]);
+    //printv_u8("c_lo", c_lo);
     SuperVector<S> c_hi = mask_hi.pshufb(chars.rshift64(4) & low4bits);
     SuperVector<S> t = c_lo & c_hi;
 
-    print_m128_16x8("low4bits", low4bits.u.v128[0]);
-    print_m128_16x8("mask_lo", mask_lo.u.v128[0]);
-    print_m128_16x8("mask_hi", mask_hi.u.v128[0]);
-    print_m128_16x8("chars", chars.u.v128[0]);
-    print_m128_16x8("c_lo", c_lo.u.v128[0]);
-    print_m128_16x8("c_hi", c_hi.u.v128[0]);
-    print_m128_16x8("t", t.u.v128[0]);
+    /*printv_u8("low4bits", low4bits);
+    printv_u8("mask_lo", mask_lo);
+    printv_u8("mask_hi", mask_hi);
+    printv_u8("chars", chars);
+    printv_u8("c_lo", c_lo);
+    printv_u8("c_hi", c_hi);
+    printv_u8("t", t);*/
 
     return t.eqmask(SuperVector<S>::Zeroes());
 }
@@ -70,7 +67,6 @@ const u8 *firstMatch(const u8 *buf, typename SuperVector<S>::movemask_type z);
 
 template <uint16_t S>
 const u8 *lastMatch(const u8 *buf, typename SuperVector<S>::movemask_type z);
-
 
 template <>
 really_inline
@@ -121,7 +117,7 @@ const u8 *shortShufti(SuperVector<S> mask_lo, SuperVector<S> mask_hi, const u8 *
     assert(len <= S);
 
     SuperVector<S> chars = SuperVector<S>::loadu_maskz(buf, static_cast<uint8_t>(len));
-    print_m128_16x8("chars", chars.u.v128[0]);
+    //printv_u8("chars", chars);
     uint8_t alignment = (uintptr_t)(buf) & 15;
     typename SuperVector<S>::movemask_type maskb = 1 << alignment;
     typename SuperVector<S>::movemask_type maske = SINGLE_LOAD_MASK(len - alignment);
@@ -183,7 +179,7 @@ const u8 *shuftiExecReal(m128 mask_lo, m128 mask_hi, const u8 *buf, const u8 *bu
     DEBUG_PRINTF("shufti %p len %zu\n", buf, buf_end - buf);
     DEBUG_PRINTF("b %s\n", buf);
 
-    const SuperVector<S> low4bits = SuperVector<S>::set1u_16x8(0xf);
+    const SuperVector<S> low4bits = SuperVector<S>::dup_u8(0xf);
     const SuperVector<S> wide_mask_lo(mask_lo);
     const SuperVector<S> wide_mask_hi(mask_hi);
 
@@ -240,7 +236,7 @@ const u8 *rshuftiExecReal(m128 mask_lo, m128 mask_hi, const u8 *buf, const u8 *b
     DEBUG_PRINTF("shufti %p len %zu\n", buf, buf_end - buf);
     DEBUG_PRINTF("b %s\n", buf);
 
-    const SuperVector<S> low4bits = SuperVector<S>::set1u_16x8(0xf);
+    const SuperVector<S> low4bits = SuperVector<S>::dup_u8(0xf);
     const SuperVector<S> wide_mask_lo(mask_lo);
     const SuperVector<S> wide_mask_hi(mask_hi);
 
@@ -316,7 +312,7 @@ const u8 *shuftiDoubleExecReal(m128 mask1_lo, m128 mask1_hi,
     DEBUG_PRINTF("shufti %p len %zu\n", buf, buf_end - buf);
     DEBUG_PRINTF("b %s\n", buf);
 
-    const SuperVector<S> low4bits = SuperVector<S>::set1u_16x8(0xf);
+    const SuperVector<S> low4bits = SuperVector<S>::dup_u8(0xf);
     const SuperVector<S> wide_mask1_lo(mask1_lo);
     const SuperVector<S> wide_mask1_hi(mask1_hi);
     const SuperVector<S> wide_mask2_lo(mask2_lo);

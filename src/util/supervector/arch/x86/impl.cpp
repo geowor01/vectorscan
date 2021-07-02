@@ -36,7 +36,7 @@
 #include "ue2common.h"
 #include "util/arch.h"
 #include "util/unaligned.h"
-#include "util/simd/types.hpp"
+#include "util/supervector/arch/arm/types.hpp"
 
 #if !defined(m128) && defined(HAVE_SSE2)
 typedef __m128i m128;
@@ -170,17 +170,6 @@ really_inline SuperVector<16> SuperVector<16>::operator^(SuperVector<16> const b
     return {_mm_xor_si128(u.v128[0], b.u.v128[0])};
 }
 
-template <>
-really_inline SuperVector<16> SuperVector<16>::opand(SuperVector<16> const b) const
-{
-    return *this & b;
-}
-
-template <>
-really_inline SuperVector<16> SuperVector<16>::opxor(SuperVector<16> const b) const
-{
-    return *this ^ b;
-}
 
 template <>
 really_inline SuperVector<16> SuperVector<16>::opandnot(SuperVector<16> const b) const
