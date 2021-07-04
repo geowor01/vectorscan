@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015-2017, Intel Corporation
+ * Copyright (c) 2020-2021, VectorCamp PC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,76 +40,7 @@
 #include "util/unaligned.h"
 
 #include "util/supervector/supervector.hpp"
-
-
-template <uint16_t S>
-const u8 *firstMatch(const u8 *buf, typename SuperVector<S>::movemask_type z);
-
-template <uint16_t S>
-const u8 *lastMatch(const u8 *buf, typename SuperVector<S>::movemask_type z);
-
-
-template <>
-really_inline
-const u8 *firstMatch<16>(const u8 *buf, typename SuperVector<16>::movemask_type z) {
-    DEBUG_PRINTF("buf %p z %08x \n", buf, z);
-    DEBUG_PRINTF("z %08x\n", z);
-    if (unlikely(z != 0xffff)) {
-        u32 pos = ctz32(~z & 0xffff);
-        DEBUG_PRINTF("~z %08x\n", ~z);
-        DEBUG_PRINTF("match @ pos %u\n", pos);
-        assert(pos < 16);
-        return buf + pos;
-    } else {
-        return NULL; // no match
-    }
-}
-
-template <>
-really_inline
-const u8 *firstMatch<64>(const u8 *buf, typename SuperVector<64>::movemask_type z) {
-    DEBUG_PRINTF("z 0x%016llx\n", z);
-    if (unlikely(z != ~0ULL)) {
-        u32 pos = ctz64(~z);
-        DEBUG_PRINTF("match @ pos %u\n", pos);
-        assert(pos < 64);
-        return buf + pos;
-    } else {
-        return NULL; // no match
-    }
-}
-
-
-template <>
-really_inline
-const u8 *lastMatch<16>(const u8 *buf, typename SuperVector<16>::movemask_type z) {
-    DEBUG_PRINTF("buf %p z %08x \n", buf, z);
-    DEBUG_PRINTF("z %08x\n", z);
-    if (unlikely(z != 0xffff)) {
-        u32 pos = clz32(~z & 0xffff);
-        DEBUG_PRINTF("~z %08x\n", ~z);
-        DEBUG_PRINTF("match @ pos %u\n", pos);
-        assert(pos >= 16 && pos < 32);
-        return buf + (31 - pos);
-    } else {
-        return NULL; // no match
-    }
-}
-
-template <>
-really_inline
-const u8 *lastMatch<64>(const u8 *buf, typename SuperVector<64>::movemask_type z) {
-    DEBUG_PRINTF("z 0x%016llx\n", z);
-    if (unlikely(z != ~0ULL)) {
-        u32 pos = clz64(~z);
-        DEBUG_PRINTF("match @ pos %u\n", pos);
-        assert(pos < 64);
-        return buf + pos;
-    } else {
-        return NULL; // no match
-    }
-}
-
+#include "util/match.hpp"
 
 template <uint16_t S>
 static really_inline
@@ -130,7 +62,6 @@ typename SuperVector<S>::movemask_type block(SuperVector<S> shuf_mask_lo_highcle
 
     return tmp.eqmask(SuperVector<S>::Zeroes());
 }
-
 
 template <uint16_t S>
 static really_inline const u8 *truffleMini(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S> shuf_mask_lo_highset,
