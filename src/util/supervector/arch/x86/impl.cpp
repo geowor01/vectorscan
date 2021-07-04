@@ -36,7 +36,7 @@
 #include "ue2common.h"
 #include "util/arch.h"
 #include "util/unaligned.h"
-#include "util/supervector/arch/x86/types.hpp"
+#include "util/supervector/supervector.hpp"
 
 // 128-bit SSE implementation
 
@@ -293,7 +293,7 @@ really_inline SuperVector<16> SuperVector<16>::alignr(SuperVector<16> &other, in
 	case 13: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 3)}; break;
 	case 14: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 2)}; break;
 	case 15: return {_mm_alignr_epi8(u.v128[0], other.u.v128[0], 1)}; break;
-	case 16: return l; break;
+	case 16: return other; break;
 	default: break;
 	}
 	return *this;
@@ -449,13 +449,13 @@ really_inline void SuperVector<32>::operator=(SuperVector<32> const &o)
 }
 
 template <>
-really_inline SuperVector<32> SuperVector<32>::operator&(SuperVector<32> const b) const
+really_inline SuperVector<32> SuperVector<32>::operator&(SuperVector<32> const &b) const
 {
     return {_mm256_and_si256(u.v256[0], b.u.v256[0])};
 }
 
 template <>
-really_inline SuperVector<32> SuperVector<32>::eq(SuperVector<32> const b) const
+really_inline SuperVector<32> SuperVector<32>::eq(SuperVector<32> const &b) const
 {
     return {_mm256_cmpeq_epi8(u.v256[0], b.u.v256[0])};
 }
@@ -518,41 +518,41 @@ really_inline SuperVector<32> SuperVector<32>::load(void const *ptr)
     ptr = assume_aligned(ptr, SuperVector::size);
     return {_mm256_load_si256((const m256 *)ptr)};
 }
-
+/*
 template <>
 really_inline SuperVector<32> SuperVector<32>::loadu_mask(void const *ptr, size_t const len)
 {
 
     return {_mm256_loadu_si256((const m256 *)ptr)};
-}
+}*/
 
 #ifndef DEBUG
 template<>
-really_inline SuperVector<32> SuperVector<32>::alignr(SuperVector<32> l, int8_t offset)
+really_inline SuperVector<32> SuperVector<32>::alignr(SuperVector<32> &other, int8_t offset)
 {
-    return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], offset)};
+    return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], offset)};
 }
 #else
 template<>
-really_inline SuperVector<32> SuperVector<32>::alignr(SuperVector<32> l, int8_t offset)
+really_inline SuperVector<32> SuperVector<32>::alignr(SuperVector<32> &other, int8_t offset)
 {
 	switch(offset) {
-	case 0: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 0)};; break;
-	case 1: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 1)}; break;
-	case 2: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 2)}; break;
-	case 3: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 3)}; break;
-	case 4: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 4)}; break;
-	case 5: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 5)}; break;
-	case 6: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 6)}; break;
-	case 7: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 7)}; break;
-	case 8: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 8)}; break;
-	case 9: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 9)}; break;
-	case 10: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 10)}; break;
-	case 11: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 11)}; break;
-	case 12: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 12)}; break;
-	case 13: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 13)}; break;
-	case 14: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 14)}; break;
-	case 15: return {_mm256_alignr_epi8(u.v256[0], l.u.v256[0], 15)}; break;
+	case 0: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 0)};; break;
+	case 1: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 1)}; break;
+	case 2: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 2)}; break;
+	case 3: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 3)}; break;
+	case 4: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 4)}; break;
+	case 5: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 5)}; break;
+	case 6: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 6)}; break;
+	case 7: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 7)}; break;
+	case 8: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 8)}; break;
+	case 9: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 9)}; break;
+	case 10: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 10)}; break;
+	case 11: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 11)}; break;
+	case 12: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 12)}; break;
+	case 13: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 13)}; break;
+	case 14: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 14)}; break;
+	case 15: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 15)}; break;
 	default: break;
 	}
 	return *this;
