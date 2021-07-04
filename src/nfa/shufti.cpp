@@ -1,5 +1,6 @@
 /*
  * Copyright (c) 2015-2017, Intel Corporation
+ * Copyright (c) 2020, 2021, VectorCamp PC
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -36,44 +37,6 @@
 #include "ue2common.h"
 #include "util/arch.h"
 #include "util/bitutils.h"
-
-#ifdef DEBUG
-#include <ctype.h>
-
-#define DUMP_MSK(_t)                                \
-static UNUSED                                       \
-void dumpMsk##_t(m##_t msk) {                       \
-    u8 * mskAsU8 = (u8 *)&msk;                      \
-    for (unsigned i = 0; i < sizeof(msk); i++) {    \
-        u8 c = mskAsU8[i];                          \
-        for (int j = 0; j < 8; j++) {               \
-            if ((c >> (7-j)) & 0x1)                 \
-                printf("1");                        \
-            else                                    \
-                printf("0");                        \
-        }                                           \
-        printf(" ");                                \
-    }                                               \
-}                                                   \
-static UNUSED                                       \
-void dumpMsk##_t##AsChars(m##_t msk) {              \
-    u8 * mskAsU8 = (u8 *)&msk;                      \
-    for (unsigned i = 0; i < sizeof(msk); i++) {    \
-        u8 c = mskAsU8[i];                          \
-        if (isprint(c))                             \
-            printf("%c",c);                         \
-        else                                        \
-            printf(".");                            \
-    }                                               \
-}
-
-#endif
-
-#ifdef DEBUG
-DUMP_MSK(128)
-#endif
-
-
 
 /** \brief Naive byte-by-byte implementation. */
 static really_inline
