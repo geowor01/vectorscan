@@ -145,7 +145,6 @@ const u8 *truffleExecReal(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S> 
     }
     
     return rv;
-
 }
 
 
@@ -156,7 +155,6 @@ static really_inline const u8 *truffleRevMini(SuperVector<S> shuf_mask_lo_highcl
     assert(len < 16);
     
     SuperVector<S> chars = SuperVector<S>::loadu(buf); 
-
 
     u32 mask = (0xffff >> (16 - len)) ^ 0xffff;
     
@@ -215,21 +213,18 @@ const u8 *rtruffleExecReal(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S>
             rv = revBlock(wide_shuf_mask_lo_highclear, wide_shuf_mask_lo_highset, chars, d);
             if (rv) return rv;
         }
-
-        
     }
 
-    DEBUG_PRINTF("d %p e %p \n", buf, d);
+    DEBUG_PRINTF("tail: d %p e %p \n", buf, d);
     // finish off tail
 
     if (d != buf) {
         rv = truffleRevMini(shuf_mask_lo_highclear, shuf_mask_lo_highset, buf, d);
         DEBUG_PRINTF("rv %p \n", rv);
-        if (rv != d - 1) return rv;
+        if (rv) return rv;
     }
     
-    return buf;
-
+    return buf - 1;
 }
 
 

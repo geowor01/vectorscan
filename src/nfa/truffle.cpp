@@ -37,7 +37,6 @@
 #include "util/arch.h"
 #include "util/bitutils.h"
 
-
 #if !defined(HAVE_SVE)
 #include "truffle_simd.hpp"
 
