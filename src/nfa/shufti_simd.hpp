@@ -212,7 +212,7 @@ const u8 *rshuftiExecReal(m128 mask_lo, m128 mask_hi, const u8 *buf, const u8 *b
         rv = shuftiRevSlow((const u8 *)&mask_lo, (const u8 *)&mask_hi, buf, d);
         // rv = shortShufti(wide_mask_lo, wide_mask_hi, buf_end - S, buf_end, low4bits);
         DEBUG_PRINTF("rv %p \n", rv);
-        if (rv != d - 1) return rv;
+        if (rv) return rv;
     }
     
     return buf - 1;

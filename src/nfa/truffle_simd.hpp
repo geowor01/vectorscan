@@ -48,10 +48,7 @@ typename SuperVector<S>::movemask_type block(SuperVector<S> shuf_mask_lo_highcle
             SuperVector<S> v){
 
     SuperVector<S> highconst = SuperVector<S>::dup_u8(0x80);
-    printv_u8("highconst", highconst);
-    
     SuperVector<S> shuf_mask_hi = SuperVector<S>::dup_u64(0x8040201008040201);
-    printv_u64("shuf_mask_hi", shuf_mask_hi);
     
     SuperVector<S> shuf1 = shuf_mask_lo_highclear.pshufb(v);
     SuperVector<S> t1 = v ^ highconst;
@@ -68,7 +65,9 @@ static really_inline const u8 *truffleMini(SuperVector<S> shuf_mask_lo_highclear
                        const u8 *buf, const u8 *buf_end){
     uintptr_t len = buf_end - buf;
     assert(len < 16);
-    SuperVector<S> chars = SuperVector<S>::loadu(buf); 
+
+    SuperVector<S> chars = SuperVector<S>::Zeroes();
+    memcpy(&chars.u.u8[0], buf, len);
 
     u32 mask = (0xffff >> (16 - len)) ^ 0xffff;
     typename SuperVector<S>::movemask_type z = block(shuf_mask_lo_highclear, shuf_mask_lo_highset, chars);
@@ -80,7 +79,6 @@ static really_inline const u8 *truffleMini(SuperVector<S> shuf_mask_lo_highclear
         return buf_end;
     }
 }
-
 
 template <uint16_t S>
 static really_inline
