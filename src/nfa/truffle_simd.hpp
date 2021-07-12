@@ -57,6 +57,19 @@ typename SuperVector<S>::movemask_type block(SuperVector<S> shuf_mask_lo_highcle
     SuperVector<S> shuf3 = shuf_mask_hi.pshufb(t2);
     SuperVector<S> tmp = (shuf1 | shuf2) & shuf3;
 
+    shuf_mask_lo_highclear.print8("shuf_mask_lo_highclear");
+    shuf_mask_lo_highset.print8("shuf_mask_lo_highset");
+    v.print8("v");
+    highconst.print8("highconst");
+    shuf_mask_hi.print8("shuf_mask_hi");
+    shuf1.print8("shuf1");
+    t1.print8("t1");
+    shuf2.print8("shuf2");
+    t2.print8("t2");
+    shuf3.print8("shuf3");
+    tmp.print8("tmp");
+    DEBUG_PRINTF("z %08x \n", tmp.eqmask(SuperVector<S>::Zeroes()));
+
     return tmp.eqmask(SuperVector<S>::Zeroes());
 }
 
@@ -64,20 +77,20 @@ template <uint16_t S>
 static really_inline const u8 *truffleMini(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S> shuf_mask_lo_highset,
                        const u8 *buf, const u8 *buf_end){
     uintptr_t len = buf_end - buf;
-    assert(len < 16);
+    assert(len < S);
 
-    SuperVector<S> chars = SuperVector<S>::Zeroes();
-    memcpy(&chars.u.u8[0], buf, len);
+    DEBUG_PRINTF("buf %p buf_end %p \n", buf, buf_end);
+    SuperVector<S> chars = SuperVector<S>::loadu_maskz(buf, len);
+    chars.print8("chars");
 
-    u32 mask = (0xffff >> (16 - len)) ^ 0xffff;
     typename SuperVector<S>::movemask_type z = block(shuf_mask_lo_highclear, shuf_mask_lo_highset, chars);
-    const u8 *rv = firstMatch<S>(buf, z | mask);
+    const u8 *rv = firstMatch<S>(buf, z);
+    DEBUG_PRINTF("rv %p buf+len %p \n", rv, buf+len);
 
-    if (rv) {
+    if (rv && rv < buf+len) {
         return rv;
-    } else {
-        return buf_end;
     }
+    return buf_end;
 }
 
 template <uint16_t S>
@@ -91,7 +104,7 @@ const u8 *fwdBlock(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S> shuf_ma
 
 
 template <uint16_t S>
-const u8 *truffleExecReal(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S> shuf_mask_lo_highset, const u8 *buf, const u8 *buf_end) {
+const u8 *truffleExecReal(m128 &shuf_mask_lo_highclear, m128 shuf_mask_lo_highset, const u8 *buf, const u8 *buf_end) {
     assert(buf && buf_end);
     assert(buf < buf_end);
     DEBUG_PRINTF("truffle %p len %zu\n", buf, buf_end - buf);
@@ -107,15 +120,17 @@ const u8 *truffleExecReal(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S> 
     assert(d < buf_end);
 
     if (d + S <= buf_end) {
-        // peel off first part to cacheline boundary
-        const u8 *d1 = ROUNDUP_PTR(d, S);
-        DEBUG_PRINTF("until aligned %p \n", d1);
-        if (d1 != d) {
-            rv = truffleMini(shuf_mask_lo_highclear, shuf_mask_lo_highset, d, d1);
-            if (rv != d1) {
-                return rv;
+        if (!ISALIGNED_N(d, S)) {
+            // peel off first part to cacheline boundary
+            const u8 *d1 = ROUNDUP_PTR(d, S);
+            DEBUG_PRINTF("until aligned %p \n", d1);
+            if (d1 != d) {
+                rv = truffleMini(wide_shuf_mask_lo_highclear, wide_shuf_mask_lo_highset, d, d1);
+                if (rv != d1) {
+                    return rv;
+                }
+                d = d1;
             }
-            d = d1;
         }
 
         size_t loops = (buf_end - d) / S;
@@ -138,7 +153,7 @@ const u8 *truffleExecReal(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S> 
 
     rv = buf_end;
     if (d != buf_end) {
-        rv = truffleMini(shuf_mask_lo_highclear, shuf_mask_lo_highset, d, buf_end);
+        rv = truffleMini(wide_shuf_mask_lo_highclear, wide_shuf_mask_lo_highset, d, buf_end);
         DEBUG_PRINTF("rv %p \n", rv);
     }
     
@@ -150,16 +165,16 @@ template <uint16_t S>
 static really_inline const u8 *truffleRevMini(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S> shuf_mask_lo_highset,
             const u8 *buf, const u8 *buf_end){
     uintptr_t len = buf_end - buf;
-    assert(len < 16);
+    DEBUG_PRINTF("buf %p len %ld\n", buf, len);
+    assert(len < S);
     
-    SuperVector<S> chars = SuperVector<S>::loadu(buf); 
+    SuperVector<S> chars = SuperVector<S>::loadu_maskz(buf, len);
 
-    u32 mask = (0xffff >> (16 - len)) ^ 0xffff;
-    
     typename SuperVector<S>::movemask_type z = block(shuf_mask_lo_highclear, shuf_mask_lo_highset, chars);
-    const u8 *rv = lastMatch<S>(buf,z | mask);
+    const u8 *rv = lastMatch<S>(buf, z);
+    DEBUG_PRINTF("rv %p buf+len %p \n", rv, buf+len);
 
-    if (rv) {
+    if (rv && rv < buf+len) {
         return rv;
     }
     return buf - 1;            
@@ -176,7 +191,7 @@ const u8 *revBlock(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S> shuf_ma
 
 
 template <uint16_t S>
-const u8 *rtruffleExecReal(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S> shuf_mask_lo_highset, const u8 *buf, const u8 *buf_end){
+const u8 *rtruffleExecReal(m128 shuf_mask_lo_highclear, m128 shuf_mask_lo_highset, const u8 *buf, const u8 *buf_end){
     assert(buf && buf_end);
     assert(buf < buf_end);
     DEBUG_PRINTF("trufle %p len %zu\n", buf, buf_end - buf);
@@ -191,13 +206,15 @@ const u8 *rtruffleExecReal(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S>
     DEBUG_PRINTF("start %p end %p \n", buf, d);
     assert(d > buf);
     if (d - S >= buf) {
-        // peel off first part to cacheline boundary
-        const u8 *d1 = ROUNDDOWN_PTR(d, S);
-        DEBUG_PRINTF("until aligned %p \n", d1);
-        if (d1 != d) {
-            rv = truffleRevMini(shuf_mask_lo_highclear, shuf_mask_lo_highset, d1, d);
-            if (rv != d1 - 1) return rv;
-            d = d1;
+        if (!ISALIGNED_N(d, S)) {
+            // peel off first part to cacheline boundary
+            const u8 *d1 = ROUNDDOWN_PTR(d, S);
+            DEBUG_PRINTF("until aligned %p \n", d1);
+            if (d1 != d) {
+                rv = truffleRevMini(wide_shuf_mask_lo_highclear, wide_shuf_mask_lo_highset, d1, d);
+                if (rv != d1 - 1) return rv;
+                d = d1;
+            }
         }
 
         while (d - S >= buf) {
@@ -217,7 +234,7 @@ const u8 *rtruffleExecReal(SuperVector<S> shuf_mask_lo_highclear, SuperVector<S>
     // finish off tail
 
     if (d != buf) {
-        rv = truffleRevMini(shuf_mask_lo_highclear, shuf_mask_lo_highset, buf, d);
+        rv = truffleRevMini(wide_shuf_mask_lo_highclear, wide_shuf_mask_lo_highset, buf, d);
         DEBUG_PRINTF("rv %p \n", rv);
         if (rv) return rv;
     }
