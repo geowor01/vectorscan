@@ -58,6 +58,19 @@ const u8 *firstMatch<16>(const u8 *buf, typename SuperVector<16>::movemask_type 
 
 template <>
 really_really_inline
+const u8 *firstMatch<32>(const u8 *buf, typename SuperVector<32>::movemask_type z) {
+    DEBUG_PRINTF("z 0x%08x\n", z);
+    if (unlikely(z != 0xffffffff)) {
+        u32 pos = ctz32(~z);
+        assert(pos < 32);
+        DEBUG_PRINTF("match @ pos %u\n", pos);
+        return buf + pos;
+    } else {
+        return NULL; // no match
+    }
+}
+template <>
+really_really_inline
 const u8 *firstMatch<64>(const u8 *buf, typename SuperVector<64>::movemask_type z) {
     DEBUG_PRINTF("z 0x%016llx\n", z);
     if (unlikely(z != ~0ULL)) {
@@ -80,6 +93,19 @@ const u8 *lastMatch<16>(const u8 *buf, typename SuperVector<16>::movemask_type z
         DEBUG_PRINTF("~z %08x\n", ~z);
         DEBUG_PRINTF("match @ pos %u\n", pos);
         assert(pos >= 16 && pos < 32);
+        return buf + (31 - pos);
+    } else {
+        return NULL; // no match
+    }
+}
+
+template<>
+really_really_inline
+const u8 *lastMatch<32>(const u8 *buf, typename SuperVector<32>::movemask_type z) {
+    if (unlikely(z != 0xffffffff)) {
+        u32 pos = clz32(~z);
+        DEBUG_PRINTF("buf=%p, pos=%u\n", buf, pos);
+        assert(pos < 32);
         return buf + (31 - pos);
     } else {
         return NULL; // no match
