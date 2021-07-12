@@ -201,7 +201,7 @@ TEST(SuperVectorUtilsTest,Eqmask128c){
                                        }
 
 TEST(SuperVectorUtilsTest,LShift128c){
-    u8 vec[16] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
+    u8 vec[16] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
     auto SP = SuperVector<16>::loadu(vec);
     u8 buf[16];
     TEST_LSHIFT128(buf, vec, SP, 0);
@@ -260,7 +260,7 @@ TEST(SuperVectorUtilsTest,RShift64_128c){
                                        }
 
 TEST(SuperVectorUtilsTest,RShift128c){
-    u8 vec[16] = { 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15 };
+    u8 vec[16] = { 1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16 };
     auto SP = SuperVector<16>::loadu(vec);
     u8 buf[16];
     TEST_RSHIFT128(buf, vec, SP, 0);
