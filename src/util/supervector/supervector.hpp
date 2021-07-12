@@ -91,6 +91,7 @@ struct BaseVector
   static const bool is_valid = false;  // for template matches specialisation
   using type                 = void;
   using movemask_type        = uint32_t;
+  using previous_type        = void;
 };
 
 template <>
@@ -156,6 +157,7 @@ public:
     double   f64[SIZE / sizeof(double)];
   } u;
 
+  SuperVector() {};
   SuperVector(SuperVector const &other);
   SuperVector(typename base_type::type const v);
 
@@ -172,8 +174,6 @@ public:
   static SuperVector dup_s64(int64_t  other) { return {other}; };
 
   void operator=(SuperVector const &other);
-
-
 
   SuperVector operator&(SuperVector const &b) const;
   SuperVector operator|(SuperVector const &b) const;
@@ -202,51 +202,42 @@ public:
   // Constants
   static SuperVector Ones();
   static SuperVector Zeroes();
-};
 
-//class SuperVector<16>;
-// class SuperVector<32>;
-// class SuperVector<64>;
-// class SuperVector<128>;
+  #if defined(DEBUG)
+  void print8(const char *label) {
+      printf("%12s: ", label);
+      for(s16 i=SIZE-1; i >= 0; i--)
+          printf("%02x ", u.u8[i]);
+      printf("\n");
+  }
 
-#if defined(DEBUG)
-template <uint16_t S>
-static void printv_u8(const char *label, SuperVector<S> const &v) {
-    printf("%s: ", label);
-    for(size_t i=0; i < S; i++)
-        printf("%02x ", v.u.u8[i]);
-    printf("\n");
-}
+  void print16(const char *label) {
+      printf("%12s: ", label);
+      for(s16 i=SIZE/sizeof(u16)-1; i >= 0; i--)
+          printf("%04x ", u.u16[i]);
+      printf("\n");
+  }
 
-template <uint16_t S>
-static void printv_u16(const char *label, SuperVector<S> const &v) {
-    printf("%s: ", label);
-    for(size_t i=0; i < S/sizeof(u16); i++)
-        printf("%04x ", v.u.u16[i]);
-    printf("\n");
-}
+  void print32(const char *label) {
+      printf("%12s: ", label);
+      for(s16 i=SIZE/sizeof(u32)-1; i >= 0; i--)
+          printf("%08x ", u.u32[i]);
+      printf("\n");
+  }
 
-template <uint16_t S>
-static void printv_u32(const char *label, SuperVector<S> const &v) {
-    printf("%s: ", label);
-    for(size_t i=0; i < S/sizeof(u32); i++)
-        printf("%08x ", v.u.u32[i]);
-    printf("\n");
-}
-
-template <uint16_t S>
-static inline void printv_u64(const char *label, SuperVector<S> const &v) {
-    printf("%s: ", label);
-    for(size_t i=0; i < S/sizeof(u64a); i++)
-        printf("%016lx ", v.u.u64[i]);
-    printf("\n");
-}
+  void printv_u64(const char *label) {
+      printf("%12s: ", label);
+      for(s16 i=SIZE/sizeof(u64a)-1; i >= 0; i--)
+          printf("%016lx ", u.u64[i]);
+      printf("\n");
+  }
 #else
-#define printv_u8(a, b)   ;
-#define printv_u16(a, b)  ;
-#define printv_u32(a, b)  ;
-#define printv_u64(a, b)  ;
+  void print8(const char *label UNUSED) {};
+  void print16(const char *label UNUSED) {};
+  void print32(const char *label UNUSED) {};
+  void printv_u64(const char *label UNUSED) {};
 #endif
+};
 
 #if defined(HS_OPTIMIZE)
 #if defined(ARCH_IA32) || defined(ARCH_X86_64)
