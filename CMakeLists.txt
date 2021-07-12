@@ -33,8 +33,10 @@ endif()
 if(CMAKE_BUILD_TYPE MATCHES NONE|RELEASE|RELWITHDEBINFO|MINSIZEREL)
     message(STATUS "using release build")
     set(RELEASE_BUILD TRUE)
+    set(OPTIMISE TRUE)
 else()
     set(RELEASE_BUILD FALSE)
+    set(OPTIMISE FALSE)
 endif()
 
 set(BINDIR "${PROJECT_BINARY_DIR}/bin")
@@ -97,7 +99,7 @@ if(${RAGEL} STREQUAL "RAGEL-NOTFOUND")
     message(FATAL_ERROR "Ragel state machine compiler not found")
 endif()
 
-option(OPTIMISE "Turns off compiler optimizations (on by default unless debug output enabled or coverage testing)" TRUE)
+option(OPTIMISE "Turns off compiler optimizations (on by default unless debug output enabled or coverage testing)" FALSE)
 
 option(DEBUG_OUTPUT "Enable debug output (warning: very verbose)" FALSE)
 
