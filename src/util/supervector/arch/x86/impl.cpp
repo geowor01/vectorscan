@@ -366,6 +366,18 @@ really_inline SuperVector<16> SuperVector<16>::rshift64(uint8_t const N)
 }
 #endif
 
+template<>
+really_inline SuperVector<16> SuperVector<16>::lshift128(uint8_t const N)
+{
+	return *this << N;
+}
+
+template<>
+really_inline SuperVector<16> SuperVector<16>::rshift128(uint8_t const N)
+{
+	return *this >> N;
+}
+
 // 256-bit AVX2 implementation
 #if defined(HAVE_AVX2)
 template<>
@@ -667,6 +679,22 @@ really_inline SuperVector<32> SuperVector<32>::alignr(SuperVector<32> &other, in
 	case 13: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 13)}; break;
 	case 14: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 14)}; break;
 	case 15: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 15)}; break;
+	case 16: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 16)}; break;
+	case 17: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 17)}; break;
+	case 18: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 18)}; break;
+	case 19: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 19)}; break;
+	case 20: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 20)}; break;
+	case 21: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 21)}; break;
+	case 22: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 22)}; break;
+	case 23: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 23)}; break;
+	case 24: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 24)}; break;
+	case 25: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 25)}; break;
+	case 26: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 26)}; break;
+	case 27: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 27)}; break;
+	case 28: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 28)}; break;
+	case 29: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 39)}; break;
+	case 30: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 30)}; break;
+	case 31: return {_mm256_alignr_epi8(u.v256[0], other.u.v256[0], 31)}; break;
 	default: break;
 	}
 	return *this;
@@ -706,6 +734,22 @@ really_inline SuperVector<32> SuperVector<32>::lshift64(uint8_t const N)
 	case 13: return {_mm256_slli_epi64(u.v256[0], 13)}; break;
 	case 14: return {_mm256_slli_epi64(u.v256[0], 14)}; break;
 	case 15: return {_mm256_slli_epi64(u.v256[0], 15)}; break;
+	case 16: return {_mm256_slli_epi64(u.v256[0], 16)}; break;
+	case 17: return {_mm256_slli_epi64(u.v256[0], 17)}; break;
+	case 18: return {_mm256_slli_epi64(u.v256[0], 18)}; break;
+	case 19: return {_mm256_slli_epi64(u.v256[0], 19)}; break;
+	case 20: return {_mm256_slli_epi64(u.v256[0], 20)}; break;
+	case 21: return {_mm256_slli_epi64(u.v256[0], 21)}; break;
+	case 22: return {_mm256_slli_epi64(u.v256[0], 22)}; break;
+	case 23: return {_mm256_slli_epi64(u.v256[0], 23)}; break;
+	case 24: return {_mm256_slli_epi64(u.v256[0], 24)}; break;
+	case 25: return {_mm256_slli_epi64(u.v256[0], 25)}; break;
+	case 26: return {_mm256_slli_epi64(u.v256[0], 26)}; break;
+	case 27: return {_mm256_slli_epi64(u.v256[0], 27)}; break;
+	case 28: return {_mm256_slli_epi64(u.v256[0], 28)}; break;
+	case 29: return {_mm256_slli_epi64(u.v256[0], 29)}; break;
+	case 30: return {_mm256_slli_epi64(u.v256[0], 30)}; break;
+	case 31: return {_mm256_slli_epi64(u.v256[0], 31)}; break;
 	default: break;
 	}
 	return *this;
@@ -739,6 +783,120 @@ really_inline SuperVector<32> SuperVector<32>::rshift64(uint8_t const N)
 	case 13: return {_mm256_srli_epi64(u.v256[0], 13)}; break;
 	case 14: return {_mm256_srli_epi64(u.v256[0], 14)}; break;
 	case 15: return {_mm256_srli_epi64(u.v256[0], 15)}; break;
+	case 16: return {_mm256_srli_epi64(u.v256[0], 16)}; break;
+	case 17: return {_mm256_srli_epi64(u.v256[0], 17)}; break;
+	case 18: return {_mm256_srli_epi64(u.v256[0], 18)}; break;
+	case 19: return {_mm256_srli_epi64(u.v256[0], 19)}; break;
+	case 20: return {_mm256_srli_epi64(u.v256[0], 20)}; break;
+	case 21: return {_mm256_srli_epi64(u.v256[0], 21)}; break;
+	case 22: return {_mm256_srli_epi64(u.v256[0], 22)}; break;
+	case 23: return {_mm256_srli_epi64(u.v256[0], 23)}; break;
+	case 24: return {_mm256_srli_epi64(u.v256[0], 24)}; break;
+	case 25: return {_mm256_srli_epi64(u.v256[0], 25)}; break;
+	case 26: return {_mm256_srli_epi64(u.v256[0], 26)}; break;
+	case 27: return {_mm256_srli_epi64(u.v256[0], 27)}; break;
+	case 28: return {_mm256_srli_epi64(u.v256[0], 28)}; break;
+	case 29: return {_mm256_srli_epi64(u.v256[0], 29)}; break;
+	case 30: return {_mm256_srli_epi64(u.v256[0], 30)}; break;
+	case 31: return {_mm256_srli_epi64(u.v256[0], 31)}; break;
+	default: break;
+	}
+	return *this;
+}
+#endif
+
+#ifdef HS_OPTIMIZE
+template<>
+really_inline SuperVector<32> SuperVector<32>::lshift128(uint8_t const N)
+{
+	return {_mm256_slli_si256(u.v256[0], N)};
+}
+#else
+template<>
+really_inline SuperVector<32> SuperVector<32>::lshift128(uint8_t const N)
+{
+	switch(N) {
+	case 0: return *this; break;
+	case 1: return {_mm256_slli_si256(u.v256[0], 1)}; break;
+	case 2: return {_mm256_slli_si256(u.v256[0], 2)}; break;
+	case 3: return {_mm256_slli_si256(u.v256[0], 3)}; break;
+	case 4: return {_mm256_slli_si256(u.v256[0], 4)}; break;
+	case 5: return {_mm256_slli_si256(u.v256[0], 5)}; break;
+	case 6: return {_mm256_slli_si256(u.v256[0], 6)}; break;
+	case 7: return {_mm256_slli_si256(u.v256[0], 7)}; break;
+	case 8: return {_mm256_slli_si256(u.v256[0], 8)}; break;
+	case 9: return {_mm256_slli_si256(u.v256[0], 9)}; break;
+	case 10: return {_mm256_slli_si256(u.v256[0], 10)}; break;
+	case 11: return {_mm256_slli_si256(u.v256[0], 11)}; break;
+	case 12: return {_mm256_slli_si256(u.v256[0], 12)}; break;
+	case 13: return {_mm256_slli_si256(u.v256[0], 13)}; break;
+	case 14: return {_mm256_slli_si256(u.v256[0], 14)}; break;
+	case 15: return {_mm256_slli_si256(u.v256[0], 15)}; break;
+	case 16: return {_mm256_slli_si256(u.v256[0], 16)}; break;
+	case 17: return {_mm256_slli_si256(u.v256[0], 17)}; break;
+	case 18: return {_mm256_slli_si256(u.v256[0], 18)}; break;
+	case 19: return {_mm256_slli_si256(u.v256[0], 19)}; break;
+	case 20: return {_mm256_slli_si256(u.v256[0], 20)}; break;
+	case 21: return {_mm256_slli_si256(u.v256[0], 21)}; break;
+	case 22: return {_mm256_slli_si256(u.v256[0], 22)}; break;
+	case 23: return {_mm256_slli_si256(u.v256[0], 23)}; break;
+	case 24: return {_mm256_slli_si256(u.v256[0], 24)}; break;
+	case 25: return {_mm256_slli_si256(u.v256[0], 25)}; break;
+	case 26: return {_mm256_slli_si256(u.v256[0], 26)}; break;
+	case 27: return {_mm256_slli_si256(u.v256[0], 27)}; break;
+	case 28: return {_mm256_slli_si256(u.v256[0], 28)}; break;
+	case 29: return {_mm256_slli_si256(u.v256[0], 29)}; break;
+	case 30: return {_mm256_slli_si256(u.v256[0], 30)}; break;
+	case 31: return {_mm256_slli_si256(u.v256[0], 31)}; break;
+	default: break;
+	}
+	return *this;
+}
+#endif
+
+#ifdef HS_OPTIMIZE
+template<>
+really_inline SuperVector<32> SuperVector<32>::rshift128(uint8_t const N)
+{
+	return {_mm256_srli_si256(u.v256[0], N)};
+}
+#else
+template<>
+really_inline SuperVector<32> SuperVector<32>::rshift128(uint8_t const N)
+{
+	switch(N) {
+	case 0: return *this; break;
+	case 1: return {_mm256_srli_si256(u.v256[0], 1)}; break;
+	case 2: return {_mm256_srli_si256(u.v256[0], 2)}; break;
+	case 3: return {_mm256_srli_si256(u.v256[0], 3)}; break;
+	case 4: return {_mm256_srli_si256(u.v256[0], 4)}; break;
+	case 5: return {_mm256_srli_si256(u.v256[0], 5)}; break;
+	case 6: return {_mm256_srli_si256(u.v256[0], 6)}; break;
+	case 7: return {_mm256_srli_si256(u.v256[0], 7)}; break;
+	case 8: return {_mm256_srli_si256(u.v256[0], 8)}; break;
+	case 9: return {_mm256_srli_si256(u.v256[0], 9)}; break;
+	case 10: return {_mm256_srli_si256(u.v256[0], 10)}; break;
+	case 11: return {_mm256_srli_si256(u.v256[0], 11)}; break;
+	case 12: return {_mm256_srli_si256(u.v256[0], 12)}; break;
+	case 13: return {_mm256_srli_si256(u.v256[0], 13)}; break;
+	case 14: return {_mm256_srli_si256(u.v256[0], 14)}; break;
+	case 15: return {_mm256_srli_si256(u.v256[0], 15)}; break;
+	case 16: return {_mm256_srli_si256(u.v256[0], 16)}; break;
+	case 17: return {_mm256_srli_si256(u.v256[0], 17)}; break;
+	case 18: return {_mm256_srli_si256(u.v256[0], 18)}; break;
+	case 19: return {_mm256_srli_si256(u.v256[0], 19)}; break;
+	case 20: return {_mm256_srli_si256(u.v256[0], 20)}; break;
+	case 21: return {_mm256_srli_si256(u.v256[0], 21)}; break;
+	case 22: return {_mm256_srli_si256(u.v256[0], 22)}; break;
+	case 23: return {_mm256_srli_si256(u.v256[0], 23)}; break;
+	case 24: return {_mm256_srli_si256(u.v256[0], 24)}; break;
+	case 25: return {_mm256_srli_si256(u.v256[0], 25)}; break;
+	case 26: return {_mm256_srli_si256(u.v256[0], 26)}; break;
+	case 27: return {_mm256_srli_si256(u.v256[0], 27)}; break;
+	case 28: return {_mm256_srli_si256(u.v256[0], 28)}; break;
+	case 29: return {_mm256_srli_si256(u.v256[0], 29)}; break;
+	case 30: return {_mm256_srli_si256(u.v256[0], 30)}; break;
+	case 31: return {_mm256_srli_si256(u.v256[0], 31)}; break;
 	default: break;
 	}
 	return *this;

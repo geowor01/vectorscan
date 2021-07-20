@@ -578,6 +578,22 @@ TEST(SuperVectorUtilsTest,LShift256c){
     TEST_LSHIFT256(buf, vec, SP, 14);
     TEST_LSHIFT256(buf, vec, SP, 15);
     TEST_LSHIFT256(buf, vec, SP, 16);
+    TEST_LSHIFT256(buf, vec, SP, 17);
+    TEST_LSHIFT256(buf, vec, SP, 18);
+    TEST_LSHIFT256(buf, vec, SP, 19);
+    TEST_LSHIFT256(buf, vec, SP, 20);
+    TEST_LSHIFT256(buf, vec, SP, 21);
+    TEST_LSHIFT256(buf, vec, SP, 22);
+    TEST_LSHIFT256(buf, vec, SP, 23);
+    TEST_LSHIFT256(buf, vec, SP, 24);
+    TEST_LSHIFT256(buf, vec, SP, 25);
+    TEST_LSHIFT256(buf, vec, SP, 26);
+    TEST_LSHIFT256(buf, vec, SP, 27);
+    TEST_LSHIFT256(buf, vec, SP, 28);
+    TEST_LSHIFT256(buf, vec, SP, 29);
+    TEST_LSHIFT256(buf, vec, SP, 30);
+    TEST_LSHIFT256(buf, vec, SP, 31);
+    TEST_LSHIFT256(buf, vec, SP, 32);
 }
 
 /*
@@ -640,6 +656,22 @@ TEST(SuperVectorUtilsTest,RShift256c){
     TEST_RSHIFT256(buf, vec, SP, 14);
     TEST_RSHIFT256(buf, vec, SP, 15);
     TEST_RSHIFT256(buf, vec, SP, 16);
+    TEST_RSHIFT256(buf, vec, SP, 17);
+    TEST_RSHIFT256(buf, vec, SP, 18);
+    TEST_RSHIFT256(buf, vec, SP, 19);
+    TEST_RSHIFT256(buf, vec, SP, 20);
+    TEST_RSHIFT256(buf, vec, SP, 21);
+    TEST_RSHIFT256(buf, vec, SP, 22);
+    TEST_RSHIFT256(buf, vec, SP, 23);
+    TEST_RSHIFT256(buf, vec, SP, 24);
+    TEST_RSHIFT256(buf, vec, SP, 25);
+    TEST_RSHIFT256(buf, vec, SP, 26);
+    TEST_RSHIFT256(buf, vec, SP, 27);
+    TEST_RSHIFT256(buf, vec, SP, 28);
+    TEST_RSHIFT256(buf, vec, SP, 29);
+    TEST_RSHIFT256(buf, vec, SP, 30);
+    TEST_RSHIFT256(buf, vec, SP, 31);
+    TEST_RSHIFT256(buf, vec, SP, 32);
 }
 
 
@@ -647,7 +679,9 @@ TEST(SuperVectorUtilsTest,RShift256c){
 /*
 #define TEST_ALIGNR256(v1, v2, buf, l) {                                                 \
                                            auto v_aligned = v2.alignr(v1, l);            \
+                                           v_aligned.print8("v_aligned");\
                                            for (size_t i=0; i<32; i++) {                 \
+                                               printf("vec[%ld] = %02x\n", i+l, vec[i+l]);\
                                                ASSERT_EQ(v_aligned.u.u8[i], vec[i + l]); \
                                            }                                             \
                                        }
@@ -676,6 +710,22 @@ TEST(SuperVectorUtilsTest,Alignr256c){
     TEST_ALIGNR256(SP1, SP2, vec, 14);
     TEST_ALIGNR256(SP1, SP2, vec, 15);
     TEST_ALIGNR256(SP1, SP2, vec, 16);
+    TEST_ALIGNR256(SP1, SP2, vec, 17);
+    TEST_ALIGNR256(SP1, SP2, vec, 18);
+    TEST_ALIGNR256(SP1, SP2, vec, 19);
+    TEST_ALIGNR256(SP1, SP2, vec, 20);
+    TEST_ALIGNR256(SP1, SP2, vec, 21);
+    TEST_ALIGNR256(SP1, SP2, vec, 22);
+    TEST_ALIGNR256(SP1, SP2, vec, 23);
+    TEST_ALIGNR256(SP1, SP2, vec, 24);
+    TEST_ALIGNR256(SP1, SP2, vec, 25);
+    TEST_ALIGNR256(SP1, SP2, vec, 26);
+    TEST_ALIGNR256(SP1, SP2, vec, 27);
+    TEST_ALIGNR256(SP1, SP2, vec, 28);
+    TEST_ALIGNR256(SP1, SP2, vec, 29);
+    TEST_ALIGNR256(SP1, SP2, vec, 30);
+    TEST_ALIGNR256(SP1, SP2, vec, 31);
+    TEST_ALIGNR256(SP1, SP2, vec, 32);
 }
 */
 

@@ -198,6 +198,8 @@ public:
   SuperVector pshufb(SuperVector b);
   SuperVector lshift64(uint8_t const N);
   SuperVector rshift64(uint8_t const N);
+  SuperVector lshift128(uint8_t const N);
+  SuperVector rshift128(uint8_t const N);
 
   // Constants
   static SuperVector Ones();
@@ -225,7 +227,7 @@ public:
       printf("\n");
   }
 
-  void printv_u64(const char *label) {
+  void print64(const char *label) {
       printf("%12s: ", label);
       for(s16 i=SIZE/sizeof(u64a)-1; i >= 0; i--)
           printf("%016lx ", u.u64[i]);
@@ -235,7 +237,7 @@ public:
   void print8(const char *label UNUSED) {};
   void print16(const char *label UNUSED) {};
   void print32(const char *label UNUSED) {};
-  void printv_u64(const char *label UNUSED) {};
+  void print64(const char *label UNUSED) {};
 #endif
 };
 
