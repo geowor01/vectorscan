@@ -289,11 +289,11 @@ really_inline SuperVector<16> SuperVector<16>::load(void const *ptr)
 template <>
 really_inline SuperVector<16> SuperVector<16>::loadu_maskz(void const *ptr, uint8_t const len)
 {
-    uint8_t alignment = (uintptr_t)(ptr) & 15;
-    SuperVector<16> maskb = Ones() << alignment;
-    SuperVector<16> maske = Ones() >> (16 -len - alignment);
-    SuperVector<16> v = SuperVector<16>::loadu((const m128 *)ptr);
-    return {maskb.u.v128[0] & maske.u.v128[0] & v.u.v128[0]};
+    SuperVector<16> mask = Ones() >> (16 -len);
+    mask.print8("mask");
+    SuperVector<16> v = loadu(ptr);
+    v.print8("v");
+    return mask & v;
 }
 
 #ifdef HS_OPTIMIZE
