@@ -410,5 +410,17 @@ really_inline SuperVector<16> SuperVector<16>::rshift64(uint8_t const N)
 }
 #endif
 
+template<>
+really_inline SuperVector<16> SuperVector<16>::lshift128(uint8_t const N)
+{
+	return *this << N;
+}
+
+template<>
+really_inline SuperVector<16> SuperVector<16>::rshift128(uint8_t const N)
+{
+	return *this >> N;
+}
+
 
 #endif // SIMD_IMPL_HPP
