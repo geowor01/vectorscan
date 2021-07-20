@@ -221,6 +221,7 @@ template <uint16_t S>
 static really_inline
 const u8 *fwdBlockDouble(SuperVector<S> mask1_lo, SuperVector<S> mask1_hi, SuperVector<S> mask2_lo, SuperVector<S> mask2_hi,
                     SuperVector<S> chars, const SuperVector<S> low4bits, const u8 *buf) {
+
     SuperVector<S> chars_lo = chars & low4bits;
     SuperVector<S> chars_hi = chars.rshift64(4) & low4bits;
     SuperVector<S> c1_lo = mask1_lo.pshufb(chars_lo);
@@ -230,7 +231,7 @@ const u8 *fwdBlockDouble(SuperVector<S> mask1_lo, SuperVector<S> mask1_hi, Super
     SuperVector<S> c2_lo = mask2_lo.pshufb(chars_lo);
     SuperVector<S> c2_hi = mask2_hi.pshufb(chars_hi);
     SuperVector<S> t2 = c2_lo | c2_hi;
-    SuperVector<S> t = t1 | (t2 >> 1);
+    SuperVector<S> t = t1 | (t2.rshift128(1));
 
     typename SuperVector<S>::movemask_type z = t.eqmask(SuperVector<S>::Ones());
     DEBUG_PRINTF(" z: 0x%016llx\n", (u64a)z);
@@ -264,6 +265,7 @@ const u8 *shuftiDoubleExecReal(m128 mask1_lo, m128 mask1_hi,
         if (d1 != d) {
             SuperVector<S> chars = SuperVector<S>::loadu(d);
             rv = fwdBlockDouble(wide_mask1_lo, wide_mask1_hi, wide_mask2_lo, wide_mask2_hi, chars, low4bits, d);
+            DEBUG_PRINTF("rv %p \n", rv);
             if (rv) return rv;
             d = d1;
         }
