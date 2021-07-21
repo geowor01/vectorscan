@@ -200,6 +200,8 @@ public:
   SuperVector rshift64(uint8_t const N);
   SuperVector lshift128(uint8_t const N);
   SuperVector rshift128(uint8_t const N);
+  SuperVector lshift128_var(uint8_t const N) const;
+  SuperVector rshift128_var(uint8_t const N) const;
 
   // Constants
   static SuperVector Ones();
