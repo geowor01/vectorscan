@@ -236,7 +236,7 @@ const u8 *rtruffleExecReal(m128 shuf_mask_lo_highclear, m128 shuf_mask_lo_highse
     if (d != buf) {
         rv = truffleRevMini(wide_shuf_mask_lo_highclear, wide_shuf_mask_lo_highset, buf, d);
         DEBUG_PRINTF("rv %p \n", rv);
-        if (rv) return rv;
+        if (rv >= buf && rv < buf_end) return rv;
     }
     
     return buf - 1;
