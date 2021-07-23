@@ -221,23 +221,9 @@ TEST(SuperVectorUtilsTest,LShift128c){
     for (int i = 0; i<16; i++ ){ vec[i] = i+1; }
     auto SP = SuperVector<16>::loadu(vec);
     u8 buf[16];
-    TEST_LSHIFT128(buf, vec, SP, 0);
-    TEST_LSHIFT128(buf, vec, SP, 1);
-    TEST_LSHIFT128(buf, vec, SP, 2);
-    TEST_LSHIFT128(buf, vec, SP, 3);
-    TEST_LSHIFT128(buf, vec, SP, 4);
-    TEST_LSHIFT128(buf, vec, SP, 5);
-    TEST_LSHIFT128(buf, vec, SP, 6);
-    TEST_LSHIFT128(buf, vec, SP, 7);
-    TEST_LSHIFT128(buf, vec, SP, 8);
-    TEST_LSHIFT128(buf, vec, SP, 9);
-    TEST_LSHIFT128(buf, vec, SP, 10);
-    TEST_LSHIFT128(buf, vec, SP, 11);
-    TEST_LSHIFT128(buf, vec, SP, 12);
-    TEST_LSHIFT128(buf, vec, SP, 13);
-    TEST_LSHIFT128(buf, vec, SP, 14);
-    TEST_LSHIFT128(buf, vec, SP, 15);
-    TEST_LSHIFT128(buf, vec, SP, 16);
+    for (int j = 0; j<16; j++) { 
+        TEST_LSHIFT128(buf, vec, SP, j);
+    }
 }
 
 TEST(SuperVectorUtilsTest,LShift64_128c){
@@ -281,23 +267,9 @@ TEST(SuperVectorUtilsTest,RShift128c){
     for (int i = 0; i<16; i++ ){ vec[i] = i+1; }
     auto SP = SuperVector<16>::loadu(vec);
     u8 buf[16];
-    TEST_RSHIFT128(buf, vec, SP, 0);
-    TEST_RSHIFT128(buf, vec, SP, 1);
-    TEST_RSHIFT128(buf, vec, SP, 2);
-    TEST_RSHIFT128(buf, vec, SP, 3);
-    TEST_RSHIFT128(buf, vec, SP, 4);
-    TEST_RSHIFT128(buf, vec, SP, 5);
-    TEST_RSHIFT128(buf, vec, SP, 6);
-    TEST_RSHIFT128(buf, vec, SP, 7);
-    TEST_RSHIFT128(buf, vec, SP, 8);
-    TEST_RSHIFT128(buf, vec, SP, 9);
-    TEST_RSHIFT128(buf, vec, SP, 10);
-    TEST_RSHIFT128(buf, vec, SP, 11);
-    TEST_RSHIFT128(buf, vec, SP, 12);
-    TEST_RSHIFT128(buf, vec, SP, 13);
-    TEST_RSHIFT128(buf, vec, SP, 14);
-    TEST_RSHIFT128(buf, vec, SP, 15);
-    TEST_RSHIFT128(buf, vec, SP, 16);
+    for (int j = 0; j<16; j++) { 
+        TEST_RSHIFT128(buf, vec, SP, j);
+    }
 }
 
 TEST(SuperVectorUtilsTest,pshufb128c) {
@@ -561,39 +533,9 @@ TEST(SuperVectorUtilsTest,LShift256c){
     for (int i = 0; i<32; i++) { vec[i]= i+1;}
     auto SP = SuperVector<32>::loadu(vec);
     u8 buf[32];
-    TEST_LSHIFT256(buf, vec, SP, 0);
-    TEST_LSHIFT256(buf, vec, SP, 1);
-    TEST_LSHIFT256(buf, vec, SP, 2);
-    TEST_LSHIFT256(buf, vec, SP, 3);
-    TEST_LSHIFT256(buf, vec, SP, 4);
-    TEST_LSHIFT256(buf, vec, SP, 5);
-    TEST_LSHIFT256(buf, vec, SP, 6);
-    TEST_LSHIFT256(buf, vec, SP, 7);
-    TEST_LSHIFT256(buf, vec, SP, 8);
-    TEST_LSHIFT256(buf, vec, SP, 9);
-    TEST_LSHIFT256(buf, vec, SP, 10);
-    TEST_LSHIFT256(buf, vec, SP, 11);
-    TEST_LSHIFT256(buf, vec, SP, 12);
-    TEST_LSHIFT256(buf, vec, SP, 13);
-    TEST_LSHIFT256(buf, vec, SP, 14);
-    TEST_LSHIFT256(buf, vec, SP, 15);
-    TEST_LSHIFT256(buf, vec, SP, 16);
-    TEST_LSHIFT256(buf, vec, SP, 17);
-    TEST_LSHIFT256(buf, vec, SP, 18);
-    TEST_LSHIFT256(buf, vec, SP, 19);
-    TEST_LSHIFT256(buf, vec, SP, 20);
-    TEST_LSHIFT256(buf, vec, SP, 21);
-    TEST_LSHIFT256(buf, vec, SP, 22);
-    TEST_LSHIFT256(buf, vec, SP, 23);
-    TEST_LSHIFT256(buf, vec, SP, 24);
-    TEST_LSHIFT256(buf, vec, SP, 25);
-    TEST_LSHIFT256(buf, vec, SP, 26);
-    TEST_LSHIFT256(buf, vec, SP, 27);
-    TEST_LSHIFT256(buf, vec, SP, 28);
-    TEST_LSHIFT256(buf, vec, SP, 29);
-    TEST_LSHIFT256(buf, vec, SP, 30);
-    TEST_LSHIFT256(buf, vec, SP, 31);
-    TEST_LSHIFT256(buf, vec, SP, 32);
+    for (int j = 0; j<32; j++) { 
+        TEST_LSHIFT256(buf, vec, SP, j);
+    }
 }
 
 /*
@@ -639,39 +581,9 @@ TEST(SuperVectorUtilsTest,RShift256c){
     for (int i = 0; i<32; i++) { vec[i]= i+1;}
     auto SP = SuperVector<32>::loadu(vec);
     u8 buf[32];
-    TEST_RSHIFT256(buf, vec, SP, 0);
-    TEST_RSHIFT256(buf, vec, SP, 1);
-    TEST_RSHIFT256(buf, vec, SP, 2);
-    TEST_RSHIFT256(buf, vec, SP, 3);
-    TEST_RSHIFT256(buf, vec, SP, 4);
-    TEST_RSHIFT256(buf, vec, SP, 5);
-    TEST_RSHIFT256(buf, vec, SP, 6);
-    TEST_RSHIFT256(buf, vec, SP, 7);
-    TEST_RSHIFT256(buf, vec, SP, 8);
-    TEST_RSHIFT256(buf, vec, SP, 9);
-    TEST_RSHIFT256(buf, vec, SP, 10);
-    TEST_RSHIFT256(buf, vec, SP, 11);
-    TEST_RSHIFT256(buf, vec, SP, 12);
-    TEST_RSHIFT256(buf, vec, SP, 13);
-    TEST_RSHIFT256(buf, vec, SP, 14);
-    TEST_RSHIFT256(buf, vec, SP, 15);
-    TEST_RSHIFT256(buf, vec, SP, 16);
-    TEST_RSHIFT256(buf, vec, SP, 17);
-    TEST_RSHIFT256(buf, vec, SP, 18);
-    TEST_RSHIFT256(buf, vec, SP, 19);
-    TEST_RSHIFT256(buf, vec, SP, 20);
-    TEST_RSHIFT256(buf, vec, SP, 21);
-    TEST_RSHIFT256(buf, vec, SP, 22);
-    TEST_RSHIFT256(buf, vec, SP, 23);
-    TEST_RSHIFT256(buf, vec, SP, 24);
-    TEST_RSHIFT256(buf, vec, SP, 25);
-    TEST_RSHIFT256(buf, vec, SP, 26);
-    TEST_RSHIFT256(buf, vec, SP, 27);
-    TEST_RSHIFT256(buf, vec, SP, 28);
-    TEST_RSHIFT256(buf, vec, SP, 29);
-    TEST_RSHIFT256(buf, vec, SP, 30);
-    TEST_RSHIFT256(buf, vec, SP, 31);
-    TEST_RSHIFT256(buf, vec, SP, 32);
+    for (int j = 0; j<32; j++) { 
+        TEST_RSHIFT256(buf, vec, SP, j);
+    }
 }
 
 
@@ -922,9 +834,7 @@ TEST(SuperVectorUtilsTest,pshufb512c) {
     }
 }
 
-
 /*Define LSHIFT512 macro*/
-/*
 #define TEST_LSHIFT512(buf, vec, v, l) {                                                  \
                                            auto v_shifted = v << (l);                     \
                                            for (int i=63; i>= l; --i) {                   \
@@ -940,28 +850,13 @@ TEST(SuperVectorUtilsTest,pshufb512c) {
 
 TEST(SuperVectorUtilsTest,LShift512c){
     u8 vec[64];
-    for (int i=0; i<64; i++) { vec[i] = i+1;}
+    for (int i = 0; i<64; i++) { vec[i]= i+1;}
     auto SP = SuperVector<64>::loadu(vec);
     u8 buf[64];
-    TEST_LSHIFT512(buf, vec, SP, 0);
-    TEST_LSHIFT512(buf, vec, SP, 1);
-    TEST_LSHIFT512(buf, vec, SP, 2);
-    TEST_LSHIFT512(buf, vec, SP, 3);
-    TEST_LSHIFT512(buf, vec, SP, 4);
-    TEST_LSHIFT512(buf, vec, SP, 5);
-    TEST_LSHIFT512(buf, vec, SP, 6);
-    TEST_LSHIFT512(buf, vec, SP, 7);
-    TEST_LSHIFT512(buf, vec, SP, 8);
-    TEST_LSHIFT512(buf, vec, SP, 9);
-    TEST_LSHIFT512(buf, vec, SP, 10);
-    TEST_LSHIFT512(buf, vec, SP, 11);
-    TEST_LSHIFT512(buf, vec, SP, 12);
-    TEST_LSHIFT512(buf, vec, SP, 13);
-    TEST_LSHIFT512(buf, vec, SP, 14);
-    TEST_LSHIFT512(buf, vec, SP, 15);
-    TEST_LSHIFT512(buf, vec, SP, 16);
+    for (int j = 0; j<64; j++) { 
+        TEST_LSHIFT512(buf, vec, SP, j);
+    }
 }
-*/
 
 /*
 TEST(SuperVectorUtilsTest,LShift64_512c){
@@ -988,7 +883,6 @@ TEST(SuperVectorUtilsTest,RShift64_512c){
 */
 
 /*Define RSHIFT512 macro*/
-/*
 #define TEST_RSHIFT512(buf, vec, v, l) {                                                  \
                                            auto v_shifted = v >> (l);                     \
                                            for (int i=0; i<64-l; i++) {                   \
@@ -1004,28 +898,13 @@ TEST(SuperVectorUtilsTest,RShift64_512c){
 
 TEST(SuperVectorUtilsTest,RShift512c){
     u8 vec[64];
-    for (int i=0; i<64; i++) { vec[i] = i+1;}
-    auto SP = SuperVector<32>::loadu(vec);
+    for (int i = 0; i<64; i++) { vec[i]= i+1;}
+    auto SP = SuperVector<64>::loadu(vec);
     u8 buf[64];
-    TEST_RSHIFT512(buf, vec, SP, 0);
-    TEST_RSHIFT512(buf, vec, SP, 1);
-    TEST_RSHIFT512(buf, vec, SP, 2);
-    TEST_RSHIFT512(buf, vec, SP, 3);
-    TEST_RSHIFT512(buf, vec, SP, 4);
-    TEST_RSHIFT512(buf, vec, SP, 5);
-    TEST_RSHIFT512(buf, vec, SP, 6);
-    TEST_RSHIFT512(buf, vec, SP, 7);
-    TEST_RSHIFT512(buf, vec, SP, 8);
-    TEST_RSHIFT512(buf, vec, SP, 9);
-    TEST_RSHIFT512(buf, vec, SP, 10);
-    TEST_RSHIFT512(buf, vec, SP, 11);
-    TEST_RSHIFT512(buf, vec, SP, 12);
-    TEST_RSHIFT512(buf, vec, SP, 13);
-    TEST_RSHIFT512(buf, vec, SP, 14);
-    TEST_RSHIFT512(buf, vec, SP, 15);
-    TEST_RSHIFT512(buf, vec, SP, 16);
+    for (int j = 0; j<64; j++) { 
+        TEST_RSHIFT512(buf, vec, SP, j);
+    }
 }
-*/
 
 /*Define ALIGNR512 macro*/
 /*
