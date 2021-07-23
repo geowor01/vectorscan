@@ -120,7 +120,7 @@ const u8 *lastMatch<64>(const u8 *buf, typename SuperVector<64>::movemask_type z
         u32 pos = clz64(~z);
         DEBUG_PRINTF("match @ pos %u\n", pos);
         assert(pos < 64);
-        return buf + pos;
+        return buf + (63 - pos);
     } else {
         return NULL; // no match
     }
