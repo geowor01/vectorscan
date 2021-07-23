@@ -56,7 +56,6 @@
 #include "util/compare.h"
 #include "util/compile_context.h"
 #include "util/container.h"
-#include "util/make_unique.h"
 #include "util/ue2_graph.h"
 #include "util/ue2string.h"
 #include "util/verify_types.h"
@@ -862,7 +861,7 @@ bytecode_ptr<NFA> prepEngine(raw_dfa &rdfa, u32 roseQuality,
 unique_ptr<SmallWriteBuild> makeSmallWriteBuilder(size_t num_patterns,
                                                   const ReportManager &rm,
                                                   const CompileContext &cc) {
-    return ue2::make_unique<SmallWriteBuildImpl>(num_patterns, rm, cc);
+    return std::make_unique<SmallWriteBuildImpl>(num_patterns, rm, cc);
 }
 
 bytecode_ptr<SmallWriteEngine> SmallWriteBuildImpl::build(u32 roseQuality) {

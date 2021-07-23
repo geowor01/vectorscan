@@ -49,7 +49,6 @@
 #include "util/compile_context.h"
 #include "util/depth.h"
 #include "util/graph_range.h"
-#include "util/make_unique.h"
 #include "util/order_check.h"
 #include "util/ue2string.h"
 
@@ -95,7 +94,7 @@ unique_ptr<NGHolder> makeFloodProneSuffix(const ue2_literal &s, size_t len,
     assert(len < s.length());
     assert(!reports.empty());
 
-    unique_ptr<NGHolder> h = ue2::make_unique<NGHolder>(NFA_SUFFIX);
+    unique_ptr<NGHolder> h = std::make_unique<NGHolder>(NFA_SUFFIX);
 
     NFAVertex u = h->start;
     for (auto it = s.begin() + s.length() - len; it != s.end(); ++it) {
@@ -114,7 +113,7 @@ unique_ptr<NGHolder> makeFloodProneSuffix(const ue2_literal &s, size_t len,
 
 static
 unique_ptr<NGHolder> makeRosePrefix(const ue2_literal &s) {
-    unique_ptr<NGHolder> h = ue2::make_unique<NGHolder>(NFA_PREFIX);
+    unique_ptr<NGHolder> h = std::make_unique<NGHolder>(NFA_PREFIX);
 
     NFAVertex u = h->startDs;
     for (const auto &c : s) {

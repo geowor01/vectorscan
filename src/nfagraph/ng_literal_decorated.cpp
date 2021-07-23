@@ -39,7 +39,6 @@
 #include "rose/rose_in_util.h"
 #include "util/compile_context.h"
 #include "util/dump_charclass.h"
-#include "util/make_unique.h"
 
 #include <algorithm>
 #include <memory>

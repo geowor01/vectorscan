@@ -42,7 +42,6 @@
 #include "parser/control_verbs.h"
 #include "parser/Parser.h"
 #include "parser/parse_error.h"
-#include "util/make_unique.h"
 #include "util/string_util.h"
 #include "util/unicode_def.h"
 #include "util/unordered.h"
@@ -331,7 +330,7 @@ GroundTruth::compile(unsigned id, bool no_callouts) {
     int errloc = 0;
     int errcode = 0;
 
-    unique_ptr<CompiledPcre> compiled = make_unique<CompiledPcre>();
+    unique_ptr<CompiledPcre> compiled = std::make_unique<CompiledPcre>();
     compiled->utf8 = flags & PCRE_UTF8;
     compiled->highlander = highlander;
     compiled->prefilter = prefilter;

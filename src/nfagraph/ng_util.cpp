@@ -39,7 +39,6 @@
 #include "parser/position.h"
 #include "util/graph_range.h"
 #include "util/graph_small_color_map.h"
-#include "util/make_unique.h"
 #include "util/order_check.h"
 #include "util/ue2string.h"
 #include "util/report_manager.h"
@@ -596,7 +595,7 @@ void cloneHolder(NGHolder &out, const NGHolder &in,
 }
 
 unique_ptr<NGHolder> cloneHolder(const NGHolder &in) {
-    unique_ptr<NGHolder> h = ue2::make_unique<NGHolder>();
+    unique_ptr<NGHolder> h = std::make_unique<NGHolder>();
     cloneHolder(*h, in);
     return h;
 }

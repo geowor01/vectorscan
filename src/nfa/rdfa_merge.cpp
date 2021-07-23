@@ -37,7 +37,6 @@
 #include "util/container.h"
 #include "util/determinise.h"
 #include "util/flat_containers.h"
-#include "util/make_unique.h"
 #include "util/report_manager.h"
 #include "util/unordered.h"
 
@@ -287,7 +286,7 @@ unique_ptr<raw_dfa> mergeTwoDfas(const raw_dfa *d1, const raw_dfa *d2,
     assert(d1->kind == d2->kind);
     assert(max_states <= MAX_DFA_STATES);
 
-    auto rdfa = ue2::make_unique<raw_dfa>(d1->kind);
+    auto rdfa = std::make_unique<raw_dfa>(d1->kind);
 
     Automaton_Merge autom(d1, d2, rm, grey);
     if (determinise(autom, rdfa->states, max_states)) {
@@ -370,7 +369,7 @@ unique_ptr<raw_dfa> mergeAllDfas(const vector<const raw_dfa *> &dfas,
     assert(all_of(begin(dfas), end(dfas),
                   [&kind](const raw_dfa *rdfa) { return rdfa->kind == kind; }));
 
-    auto rdfa = ue2::make_unique<raw_dfa>(kind);
+    auto rdfa = std::make_unique<raw_dfa>(kind);
     Automaton_Merge n(dfas, rm, grey);
 
     DEBUG_PRINTF("merging dfa\n");

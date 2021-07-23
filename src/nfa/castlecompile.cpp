@@ -50,7 +50,6 @@
 #include "util/dump_charclass.h"
 #include "util/flat_containers.h"
 #include "util/graph.h"
-#include "util/make_unique.h"
 #include "util/multibit_build.h"
 #include "util/report_manager.h"
 #include "util/verify_types.h"
@@ -977,7 +976,7 @@ unique_ptr<NGHolder> makeHolder(const CastleProto &proto,
         }
     }
 
-    auto g = ue2::make_unique<NGHolder>(proto.kind);
+    auto g = std::make_unique<NGHolder>(proto.kind);
 
     for (const auto &m : proto.repeats) {
         addToHolder(*g, m.first, m.second);

@@ -48,7 +48,6 @@
 #include "util/container.h"
 #include "util/dump_charclass.h"
 #include "util/graph.h"
-#include "util/make_unique.h"
 #include "util/ue2string.h"
 #include "util/verify_types.h"
 
@@ -300,7 +299,7 @@ unique_ptr<NGHolder> buildMaskLhs(bool anchored, u32 prefix_len,
     DEBUG_PRINTF("build %slhs len %u/%zu\n", anchored ? "anc " : "", prefix_len,
                  mask.size());
 
-    unique_ptr<NGHolder> lhs = ue2::make_unique<NGHolder>(NFA_PREFIX);
+    unique_ptr<NGHolder> lhs = std::make_unique<NGHolder>(NFA_PREFIX);
 
     assert(prefix_len);
     assert(mask.size() >= prefix_len);
@@ -568,7 +567,7 @@ unique_ptr<NGHolder> buildMaskRhs(const flat_set<ReportID> &reports,
     assert(suffix_len);
     assert(mask.size() > suffix_len);
 
-    unique_ptr<NGHolder> rhs = ue2::make_unique<NGHolder>(NFA_SUFFIX);
+    unique_ptr<NGHolder> rhs = std::make_unique<NGHolder>(NFA_SUFFIX);
     NGHolder &h = *rhs;
 
     NFAVertex succ = h.accept;
@@ -751,7 +750,7 @@ static
 unique_ptr<NGHolder> makeAnchoredGraph(const vector<CharReach> &mask,
                                        const flat_set<ReportID> &reports,
                                        bool eod) {
-    auto gp = ue2::make_unique<NGHolder>();
+    auto gp = std::make_unique<NGHolder>();
     NGHolder &g = *gp;
 
     NFAVertex u = g.start;

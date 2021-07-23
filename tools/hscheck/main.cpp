@@ -52,7 +52,6 @@
 #include "expressions.h"
 #include "string_util.h"
 #include "util/expression_path.h"
-#include "util/make_unique.h"
 
 #include "grey.h"
 #include "hs_compile.h"
@@ -664,7 +663,7 @@ int HS_CDECL main(int argc, char **argv) {
     num_of_threads = max(1u, std::thread::hardware_concurrency());
 
 #if !defined(RELEASE_BUILD)
-    g_grey = make_unique<Grey>();
+    g_grey = std::make_unique<Grey>();
 #endif
     processArgs(argc, argv, g_grey);
 

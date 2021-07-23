@@ -43,7 +43,6 @@
 #include "position_info.h"
 #include "nfagraph/ng_builder.h"
 #include "util/container.h"
-#include "util/make_unique.h"
 
 #include <algorithm>
 #include <cassert>
@@ -140,10 +139,10 @@ bool ComponentSequence::addRepeat(u32 min, u32 max,
 
 void ComponentSequence::addAlternation() {
     if (!alternation) {
-        alternation = ue2::make_unique<ComponentAlternation>();
+        alternation = std::make_unique<ComponentAlternation>();
     }
 
-    auto seq = ue2::make_unique<ComponentSequence>();
+    auto seq = std::make_unique<ComponentSequence>();
     seq->children.swap(children);
     alternation->append(move(seq));
 }

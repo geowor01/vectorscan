@@ -39,7 +39,6 @@
 #include "util/container.h"
 #include "util/flat_containers.h"
 #include "util/graph.h"
-#include "util/make_unique.h"
 
 using namespace std;
 
@@ -280,7 +279,7 @@ void findCliques(const map<u32, set<u32>> &exclusiveGroups,
     }
     // Construct the exclusivity graph
     map<u32, CliqueVertex> vertex_map;
-    unique_ptr<CliqueGraph> cg = make_unique<CliqueGraph>();
+    unique_ptr<CliqueGraph> cg = std::make_unique<CliqueGraph>();
 
     // Add vertices representing infixes/suffixes
     for (const auto &e : exclusiveGroups) {

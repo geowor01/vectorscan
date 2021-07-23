@@ -71,7 +71,6 @@
 #include "util/container.h"
 #include "util/depth.h"
 #include "util/graph_range.h"
-#include "util/make_unique.h"
 #include "util/ue2string.h"
 
 using namespace std;

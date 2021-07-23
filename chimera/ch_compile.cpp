@@ -39,7 +39,6 @@
 #include "hs_internal.h"
 #include "ue2common.h"
 #include "util/compile_error.h"
-#include "util/make_unique.h"
 #include "util/multibit_build.h"
 #include "util/target_info.h"
 
@@ -495,7 +494,7 @@ void ch_compile_multi_int(const char *const *expressions, const unsigned *flags,
         // First, build with libpcre. A build failure from libpcre will throw
         // an exception up to the caller.
         auto patternData =
-            ue2::make_unique<PatternData>(myExpr, myFlags, i, myId, mode, match_limit,
+            std::make_unique<PatternData>(myExpr, myFlags, i, myId, mode, match_limit,
                                           match_limit_recursion, platform);
         pcres.push_back(move(patternData));
         PatternData &curr = *pcres.back();

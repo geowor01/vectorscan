@@ -87,7 +87,6 @@
 #include "util/fatbit_build.h"
 #include "util/graph_range.h"
 #include "util/insertion_ordered.h"
-#include "util/make_unique.h"
 #include "util/multibit_build.h"
 #include "util/noncopyable.h"
 #include "util/order_check.h"
@@ -1203,7 +1202,7 @@ static
 unique_ptr<TamaInfo> constructTamaInfo(const RoseGraph &g,
                      const vector<ExclusiveSubengine> &subengines,
                      const bool is_suffix) {
-    unique_ptr<TamaInfo> tamaInfo = ue2::make_unique<TamaInfo>();
+    unique_ptr<TamaInfo> tamaInfo = std::make_unique<TamaInfo>();
     for (const auto &sub : subengines) {
         const auto &rose_vertices = sub.vertices;
         NFA *nfa = sub.nfa.get();

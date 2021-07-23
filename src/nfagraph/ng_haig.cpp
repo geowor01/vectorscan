@@ -44,7 +44,6 @@
 #include "util/graph.h"
 #include "util/graph_range.h"
 #include "util/hash_dynamic_bitset.h"
-#include "util/make_unique.h"
 #include "util/unordered.h"
 
 #include <algorithm>
@@ -581,7 +580,7 @@ attemptToBuildHaig(const NGHolder &g, som_type som, u32 somPrecision,
         return nullptr;
     }
 
-    auto rdfa = ue2::make_unique<raw_som_dfa>(g.kind, unordered_som, NODE_START,
+    auto rdfa = std::make_unique<raw_som_dfa>(g.kind, unordered_som, NODE_START,
                                               somPrecision);
 
     DEBUG_PRINTF("determinising nfa with %u vertices\n", numStates);
@@ -724,7 +723,7 @@ unique_ptr<raw_som_dfa> attemptToMergeHaig(const vector<const raw_som_dfa *> &df
 
     using StateSet = Automaton_Haig_Merge::StateSet;
     vector<StateSet> nfa_state_map;
-    auto rdfa = ue2::make_unique<raw_som_dfa>(dfas[0]->kind, unordered_som,
+    auto rdfa = std::make_unique<raw_som_dfa>(dfas[0]->kind, unordered_som,
                                               NODE_START,
                                               dfas[0]->stream_som_loc_width);
 

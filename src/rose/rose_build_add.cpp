@@ -56,7 +56,6 @@
 #include "util/dump_charclass.h"
 #include "util/graph_range.h"
 #include "util/insertion_ordered.h"
-#include "util/make_unique.h"
 #include "util/noncopyable.h"
 #include "util/order_check.h"
 #include "util/report_manager.h"
@@ -1794,7 +1793,7 @@ bool RoseBuildImpl::addOutfix(const NGHolder &h) {
 bool RoseBuildImpl::addOutfix(const NGHolder &h, const raw_som_dfa &haig) {
     DEBUG_PRINTF("haig with %zu states\n", haig.states.size());
 
-    outfixes.emplace_back(OutfixInfo(ue2::make_unique<raw_som_dfa>(haig)));
+    outfixes.emplace_back(OutfixInfo(std::make_unique<raw_som_dfa>(haig)));
     populateOutfixInfo(outfixes.back(), h, *this);
 
     return true; /* failure is not yet an option */
@@ -1802,7 +1801,7 @@ bool RoseBuildImpl::addOutfix(const NGHolder &h, const raw_som_dfa &haig) {
 
 bool RoseBuildImpl::addOutfix(const raw_puff &rp) {
     if (!mpv_outfix) {
-        mpv_outfix = make_unique<OutfixInfo>(MpvProto());
+        mpv_outfix = std::make_unique<OutfixInfo>(MpvProto());
     }
 
     auto *mpv = mpv_outfix->mpv();
@@ -1827,7 +1826,7 @@ bool RoseBuildImpl::addOutfix(const raw_puff &rp) {
 bool RoseBuildImpl::addChainTail(const raw_puff &rp, u32 *queue_out,
                                  u32 *event_out) {
     if (!mpv_outfix) {
-        mpv_outfix = make_unique<OutfixInfo>(MpvProto());
+        mpv_outfix = std::make_unique<OutfixInfo>(MpvProto());
     }
 
     auto *mpv = mpv_outfix->mpv();

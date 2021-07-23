@@ -46,7 +46,6 @@
 #include "util/alloc.h"
 #include "util/compare.h"
 #include "util/container.h"
-#include "util/make_unique.h"
 #include "util/noncopyable.h"
 #include "util/popcount.h"
 #include "util/small_vector.h"
@@ -677,7 +676,7 @@ unique_ptr<HWLMProto> teddyBuildProtoHinted(
         return nullptr;
     }
 
-    return ue2::make_unique<HWLMProto>(engType, move(des), lits,
+    return std::make_unique<HWLMProto>(engType, move(des), lits,
                                        bucketToLits, make_small);
 }
 

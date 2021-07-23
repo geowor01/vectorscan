@@ -39,7 +39,6 @@
 #include "util/container.h"
 #include "util/flat_containers.h"
 #include "util/graph_range.h"
-#include "util/make_unique.h"
 #include "util/order_check.h"
 #include "util/report_manager.h"
 #include "util/verify_types.h"
@@ -348,7 +347,7 @@ static never_inline
 unique_ptr<GoughGraph> makeCFG(const raw_som_dfa &raw) {
     vector<GoughVertex> vertices;
     vertices.reserve(raw.states.size());
-    unique_ptr<GoughGraph> cfg = ue2::make_unique<GoughGraph>();
+    unique_ptr<GoughGraph> cfg = std::make_unique<GoughGraph>();
     u32 min_state = !is_triggered(raw.kind);
 
     if (min_state) {
@@ -1235,7 +1234,7 @@ unique_ptr<raw_report_info> gough_build_strat::gatherReports(
 
     const bool remap_reports = has_managed_reports(rdfa.kind);
 
-    auto ri = ue2::make_unique<raw_gough_report_info_impl>();
+    auto ri = std::make_unique<raw_gough_report_info_impl>();
     map<raw_gough_report_list, u32> rev;
 
     assert(!rdfa.states.empty());

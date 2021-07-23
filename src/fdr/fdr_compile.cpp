@@ -44,7 +44,6 @@
 #include "util/compare.h"
 #include "util/container.h"
 #include "util/dump_mask.h"
-#include "util/make_unique.h"
 #include "util/math.h"
 #include "util/noncopyable.h"
 #include "util/target_info.h"
@@ -868,7 +867,7 @@ unique_ptr<HWLMProto> fdrBuildProtoInternal(u8 engType,
     auto bucketToLits = assignStringsToBuckets(lits, *des);
     addIncludedInfo(lits, des->getNumBuckets(), bucketToLits);
     auto proto =
-        ue2::make_unique<HWLMProto>(engType, move(des), lits, bucketToLits,
+        std::make_unique<HWLMProto>(engType, move(des), lits, bucketToLits,
                                     make_small);
     return proto;
 }

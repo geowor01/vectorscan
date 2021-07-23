@@ -30,7 +30,6 @@
 
 #include "gtest/gtest.h"
 #include "util/pack_bits.h"
-#include "util/make_unique.h"
 #include "ue2common.h"
 
 #include <algorithm>
@@ -92,7 +91,7 @@ void test_pack_and_unpack(const vector<T> &v, const vector<u32> &bits) {
 
     // Temporary char array to pack into.
     const size_t mem_size = packed_size(bits);
-    unique_ptr<char[]> mem = ue2::make_unique<char[]>(mem_size);
+    unique_ptr<char[]> mem = std::make_unique<char[]>(mem_size);
 
     pack_bits<T>(&mem[0], &v[0], &bits[0], elements);
 

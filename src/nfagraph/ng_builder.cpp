@@ -39,7 +39,6 @@
 #include "ue2common.h"
 #include "compiler/compiler.h" // for ParsedExpression
 #include "util/compile_error.h"
-#include "util/make_unique.h"
 
 #include <cassert>
 
@@ -114,7 +113,7 @@ private:
 
 NFABuilderImpl::NFABuilderImpl(ReportManager &rm_in, const Grey &grey_in,
                                const ParsedExpression &parsed)
-    : rm(rm_in), grey(grey_in), graph(ue2::make_unique<NGHolder>()),
+    : rm(rm_in), grey(grey_in), graph(std::make_unique<NGHolder>()),
       expr(parsed.expr), vertIdx(N_SPECIALS) {
 
     // Reserve space for a reasonably-sized NFA
@@ -270,7 +269,7 @@ void NFABuilderImpl::cloneRegion(Position first, Position last, unsigned posOffs
 
 unique_ptr<NFABuilder> makeNFABuilder(ReportManager &rm, const CompileContext &cc,
                            const ParsedExpression &expr) {
-    return ue2::make_unique<NFABuilderImpl>(rm, cc.grey, expr);
+    return std::make_unique<NFABuilderImpl>(rm, cc.grey, expr);
 }
 
 NFABuilder::~NFABuilder() { }

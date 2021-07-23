@@ -35,7 +35,6 @@
 #include "ucp_table.h"
 #include "Utf8ComponentClass.h"
 #include "util/charreach.h"
-#include "util/make_unique.h"
 
 #include <boost/icl/interval_set.hpp>
 
@@ -399,9 +398,9 @@ CharReach getPredefinedCharReach(PredefinedClass c, const ParseMode &mode) {
 
 unique_ptr<ComponentClass> getComponentClass(const ParseMode &mode) {
     if (mode.utf8) {
-        return ue2::make_unique<UTF8ComponentClass>(mode);
+        return std::make_unique<UTF8ComponentClass>(mode);
     } else {
-        return ue2::make_unique<AsciiComponentClass>(mode);
+        return std::make_unique<AsciiComponentClass>(mode);
     }
 }
 

@@ -65,7 +65,6 @@
 #include "util/container.h"
 #include "util/dump_charclass.h"
 #include "util/graph_range.h"
-#include "util/make_unique.h"
 
 #include <algorithm>
 #include <map>
@@ -364,7 +363,7 @@ makePrefix(const NGHolder &g, const unordered_map<NFAVertex, u32> &regions,
     assert(!next_enters.empty());
     assert(!curr_exits.empty());
 
-    unique_ptr<NGHolder> prefix_ptr = ue2::make_unique<NGHolder>();
+    unique_ptr<NGHolder> prefix_ptr = std::make_unique<NGHolder>();
     NGHolder &prefix = *prefix_ptr;
 
     deque<NFAVertex> lhs_verts;

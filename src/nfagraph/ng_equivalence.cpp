@@ -39,7 +39,6 @@
 #include "util/compile_context.h"
 #include "util/flat_containers.h"
 #include "util/graph_range.h"
-#include "util/make_unique.h"
 #include "util/unordered.h"
 
 #include <algorithm>
@@ -269,7 +268,7 @@ vector<unique_ptr<VertexInfo>> getVertexInfos(const NGHolder &g) {
     vertex_map.resize(num_verts);
 
     for (auto v : vertices_range(g)) {
-        infos.emplace_back(make_unique<VertexInfo>(v, g));
+        infos.emplace_back(std::make_unique<VertexInfo>(v, g));
         vertex_map[g[v].index] = infos.back().get();
     }
 
@@ -516,7 +515,7 @@ void mergeClass(vector<unique_ptr<VertexInfo>> &infos, NGHolder &g,
     g[new_v].reports.clear(); /* populated as we pull in succs */
 
     // store this vertex in our global vertex list
-    infos.emplace_back(make_unique<VertexInfo>(new_v, g));
+    infos.emplace_back(std::make_unique<VertexInfo>(new_v, g));
     VertexInfo *new_vertex_info = infos.back().get();
 
     NFAVertex new_v_eod = NGHolder::null_vertex();
@@ -525,7 +524,7 @@ void mergeClass(vector<unique_ptr<VertexInfo>> &infos, NGHolder &g,
     if (require_separate_eod_vertex(cur_class_vertices, g)) {
         new_v_eod = clone_vertex(g, old_v);
         g[new_v_eod].reports.clear();
-        infos.emplace_back(make_unique<VertexInfo>(new_v_eod, g));
+        infos.emplace_back(std::make_unique<VertexInfo>(new_v_eod, g));
         new_vertex_info_eod = infos.back().get();
     }
 

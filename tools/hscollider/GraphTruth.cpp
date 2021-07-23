@@ -50,7 +50,6 @@
 #include "parser/unsupported.h"
 #include "parser/logical_combination.h"
 #include "util/compile_context.h"
-#include "util/make_unique.h"
 #include "util/report_manager.h"
 
 #include <algorithm>
@@ -131,7 +130,7 @@ void CNGInfo::compile() {
 
     try {
         if (combination) {
-            auto pl = ue2::make_unique<ParsedLogical>();
+            auto pl = std::make_unique<ParsedLogical>();
             pl->parseLogicalCombination(id, re.c_str(), ~0U, 0, ~0ULL);
             pl->logicalKeyRenumber();
             cng = make_unique<CompiledNG>(move(pl));
@@ -148,7 +147,7 @@ void CNGInfo::compile() {
         // original expression starts with (*UTF8)
         utf8 |= pe.expr.utf8;
 
-        auto rm = ue2::make_unique<ReportManager>(cc.grey);
+        auto rm = std::make_unique<ReportManager>(cc.grey);
 
         // Expressions containing zero-width assertions and other extended pcre
         // types aren't supported yet. This call will throw a ParseError

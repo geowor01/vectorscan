@@ -41,7 +41,6 @@
 #include "util/container.h"
 #include "util/flat_containers.h"
 #include "util/hash.h"
-#include "util/make_unique.h"
 #include "util/unordered.h"
 
 #include <algorithm>
@@ -441,7 +440,7 @@ void GlushkovBuildStateImpl::buildEdges() {
 // Construct a usable GlushkovBuildState for the outside world.
 unique_ptr<GlushkovBuildState> makeGlushkovBuildState(NFABuilder &b,
                                                       bool prefilter) {
-    return ue2::make_unique<GlushkovBuildStateImpl>(b, prefilter);
+    return std::make_unique<GlushkovBuildStateImpl>(b, prefilter);
 }
 
 // free functions for utility use

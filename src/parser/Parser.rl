@@ -54,7 +54,6 @@
 #include "ue2common.h"
 #include "util/compare.h"
 #include "util/flat_containers.h"
-#include "util/make_unique.h"
 #include "util/unicode_def.h"
 #include "util/verify_types.h"
 
@@ -328,7 +327,7 @@ unichar readUtf8CodePoint4c(const char *s) {
     # enter a CAPTURING group ( e.g. '(blah)' )
     action enterCapturingGroup {
         PUSH_SEQUENCE;
-        auto seq = ue2::make_unique<ComponentSequence>();
+        auto seq = std::make_unique<ComponentSequence>();
         seq->setCaptureIndex(groupIndex++);
         currentSeq = enterSequence(currentSeq, move(seq));
     }
@@ -344,7 +343,7 @@ unichar readUtf8CodePoint4c(const char *s) {
             throw LocatedParseError("Two named subpatterns use the name '" + label + "'");
         }
         PUSH_SEQUENCE;
-        auto seq = ue2::make_unique<ComponentSequence>();
+        auto seq = std::make_unique<ComponentSequence>();
         seq->setCaptureIndex(groupIndex++);
         seq->setCaptureName(label);
         currentSeq = enterSequence(currentSeq, move(seq));
@@ -357,7 +356,7 @@ unichar readUtf8CodePoint4c(const char *s) {
         PUSH_SEQUENCE;
         mode = newMode;
         currentSeq =
-            enterSequence(currentSeq, ue2::make_unique<ComponentSequence>());
+            enterSequence(currentSeq, std::make_unique<ComponentSequence>());
     }
 
     action exitGroup {
@@ -370,25 +369,25 @@ unichar readUtf8CodePoint4c(const char *s) {
     action enterZWLookAhead {
         PUSH_SEQUENCE;
         currentSeq = enterSequence(currentSeq,
-            ue2::make_unique<ComponentAssertion>(ComponentAssertion::LOOKAHEAD,
+            std::make_unique<ComponentAssertion>(ComponentAssertion::LOOKAHEAD,
                                                  ComponentAssertion::POS));
     }
     action enterZWNegLookAhead {
         PUSH_SEQUENCE;
         currentSeq = enterSequence(currentSeq,
-            ue2::make_unique<ComponentAssertion>(ComponentAssertion::LOOKAHEAD,
+            std::make_unique<ComponentAssertion>(ComponentAssertion::LOOKAHEAD,
                                                  ComponentAssertion::NEG));
     }
     action enterZWLookBehind {
         PUSH_SEQUENCE;
         currentSeq = enterSequence(currentSeq,
-            ue2::make_unique<ComponentAssertion>(ComponentAssertion::LOOKBEHIND,
+            std::make_unique<ComponentAssertion>(ComponentAssertion::LOOKBEHIND,
                                                  ComponentAssertion::POS));
     }
     action enterZWNegLookBehind {
         PUSH_SEQUENCE;
         currentSeq = enterSequence(currentSeq,
-            ue2::make_unique<ComponentAssertion>(ComponentAssertion::LOOKBEHIND,
+            std::make_unique<ComponentAssertion>(ComponentAssertion::LOOKBEHIND,
                                                  ComponentAssertion::NEG));
     }
     action enterEmbeddedCode {
@@ -406,18 +405,18 @@ unichar readUtf8CodePoint4c(const char *s) {
         }
         PUSH_SEQUENCE;
         currentSeq = enterSequence(currentSeq,
-                ue2::make_unique<ComponentCondReference>(accumulator));
+                std::make_unique<ComponentCondReference>(accumulator));
     }
     action enterNamedConditionalRef {
         PUSH_SEQUENCE;
         assert(!label.empty());
         currentSeq = enterSequence(currentSeq,
-                ue2::make_unique<ComponentCondReference>(label));
+                std::make_unique<ComponentCondReference>(label));
     }
     action enterAtomicGroup {
         PUSH_SEQUENCE;
         currentSeq = enterSequence(currentSeq,
-                                   ue2::make_unique<ComponentAtomicGroup>());
+                                   std::make_unique<ComponentAtomicGroup>());
     }
     action eatClass {
         assert(!currentCls);
@@ -433,7 +432,7 @@ unichar readUtf8CodePoint4c(const char *s) {
     }
     action applyModifiers {
         mode = newMode;
-        currentSeq->addComponent(ue2::make_unique<ComponentEmpty>());
+        currentSeq->addComponent(std::make_unique<ComponentEmpty>());
     }
     action modifyMatchPositive {
         switch (fc) {
@@ -481,7 +480,7 @@ unichar readUtf8CodePoint4c(const char *s) {
         if (accumulator == 0) {
             throw LocatedParseError("Numbered reference cannot be zero");
         }
-        currentSeq->addComponent(ue2::make_unique<ComponentBackReference>(accumulator));
+        currentSeq->addComponent(std::make_unique<ComponentBackReference>(accumulator));
     }
 
     action addNegativeNumberedBackRef {
@@ -493,11 +492,11 @@ unichar readUtf8CodePoint4c(const char *s) {
             throw LocatedParseError("Invalid reference");
         }
         unsigned idx = groupIndex - accumulator;
-        currentSeq->addComponent(ue2::make_unique<ComponentBackReference>(idx));
+        currentSeq->addComponent(std::make_unique<ComponentBackReference>(idx));
     }
 
     action addNamedBackRef {
-        currentSeq->addComponent(ue2::make_unique<ComponentBackReference>(label));
+        currentSeq->addComponent(std::make_unique<ComponentBackReference>(label));
     }
 
     escapedOctal0 = '\\0' @clearOctAccumulator [0-7]{0,2} $appendAccumulatorOctDigit;
@@ -1305,7 +1304,7 @@ unichar readUtf8CodePoint4c(const char *s) {
                   if (mode.utf8) {
                       throw LocatedParseError("\\C is unsupported in UTF8");
                   }
-                  currentSeq->addComponent(ue2::make_unique<ComponentByte>());
+                  currentSeq->addComponent(std::make_unique<ComponentByte>());
               };
               # Match 0 or more times (greedy)
               '\*' => {
@@ -1422,39 +1421,39 @@ unichar readUtf8CodePoint4c(const char *s) {
               '\^' => {
                   auto bound = mode.multiline ? ComponentBoundary::BEGIN_LINE
                                               : ComponentBoundary::BEGIN_STRING;
-                  currentSeq->addComponent(ue2::make_unique<ComponentBoundary>(bound));
+                  currentSeq->addComponent(std::make_unique<ComponentBoundary>(bound));
               };
               # End of data (with optional internal newline); also before
               # internal newline in multiline mode
               '\$' => {
                   auto bound = mode.multiline ? ComponentBoundary::END_LINE
                                               : ComponentBoundary::END_STRING_OPTIONAL_LF;
-                  currentSeq->addComponent(ue2::make_unique<ComponentBoundary>(bound));
+                  currentSeq->addComponent(std::make_unique<ComponentBoundary>(bound));
               };
               # Beginning of data
               '\\A' => {
                   auto bound = ComponentBoundary::BEGIN_STRING;
-                  currentSeq->addComponent(ue2::make_unique<ComponentBoundary>(bound));
+                  currentSeq->addComponent(std::make_unique<ComponentBoundary>(bound));
               };
               # End of data (with optional internal newline)
               '\\Z' => {
                   auto bound = ComponentBoundary::END_STRING_OPTIONAL_LF;
-                  currentSeq->addComponent(ue2::make_unique<ComponentBoundary>(bound));
+                  currentSeq->addComponent(std::make_unique<ComponentBoundary>(bound));
               };
               # End of data
               '\\z' => {
                   auto bound = ComponentBoundary::END_STRING;
-                  currentSeq->addComponent(ue2::make_unique<ComponentBoundary>(bound));
+                  currentSeq->addComponent(std::make_unique<ComponentBoundary>(bound));
               };
               # Word boundary
               '\\b' => {
                   currentSeq->addComponent(
-                      ue2::make_unique<ComponentWordBoundary>(ts - ptr, false, mode));
+                      std::make_unique<ComponentWordBoundary>(ts - ptr, false, mode));
               };
               # Non-word boundary
               '\\B' => {
                   currentSeq->addComponent(
-                      ue2::make_unique<ComponentWordBoundary>(ts - ptr, true, mode));
+                      std::make_unique<ComponentWordBoundary>(ts - ptr, true, mode));
               };
 
               #############################################################
@@ -1494,7 +1493,7 @@ unichar readUtf8CodePoint4c(const char *s) {
                   // a back reference
                   accumulator = parseAsDecimal(octAccumulator);
                   if (accumulator < groupIndex) {
-                      currentSeq->addComponent(ue2::make_unique<ComponentBackReference>(accumulator));
+                      currentSeq->addComponent(std::make_unique<ComponentBackReference>(accumulator));
                   } else {
                       addEscapedOctal(currentSeq, octAccumulator, mode);
                   }
@@ -1509,7 +1508,7 @@ unichar readUtf8CodePoint4c(const char *s) {
               '\\' backRefId => {
                   // if there are enough left parens to this point, back ref
                   if (accumulator < groupIndex) {
-                      currentSeq->addComponent(ue2::make_unique<ComponentBackReference>(accumulator));
+                      currentSeq->addComponent(std::make_unique<ComponentBackReference>(accumulator));
                   } else {
                       // Otherwise, we interpret the first three digits as an
                       // octal escape, and the remaining characters stand for
@@ -1731,7 +1730,7 @@ unichar readUtf8CodePoint4c(const char *s) {
               };
 
               '\\X' => {
-                  currentSeq->addComponent(ue2::make_unique<ComponentEUS>(ts - ptr, mode));
+                  currentSeq->addComponent(std::make_unique<ComponentEUS>(ts - ptr, mode));
               };
 
               # Fall through general escaped character
@@ -1782,45 +1781,45 @@ unichar readUtf8CodePoint4c(const char *s) {
 
               # Conditional reference with a positive lookahead assertion
               '(?(?=' => {
-                  auto a = ue2::make_unique<ComponentAssertion>(
+                  auto a = std::make_unique<ComponentAssertion>(
                         ComponentAssertion::LOOKAHEAD, ComponentAssertion::POS);
                   ComponentAssertion *a_seq = a.get();
                   PUSH_SEQUENCE;
                   currentSeq = enterSequence(currentSeq,
-                        ue2::make_unique<ComponentCondReference>(move(a)));
+                        std::make_unique<ComponentCondReference>(move(a)));
                   PUSH_SEQUENCE;
                   currentSeq = a_seq;
               };
               # Conditional reference with a negative lookahead assertion
               '(?(?!' => {
-                  auto a = ue2::make_unique<ComponentAssertion>(
+                  auto a = std::make_unique<ComponentAssertion>(
                         ComponentAssertion::LOOKAHEAD, ComponentAssertion::NEG);
                   ComponentAssertion *a_seq = a.get();
                   PUSH_SEQUENCE;
                   currentSeq = enterSequence(currentSeq,
-                        ue2::make_unique<ComponentCondReference>(move(a)));
+                        std::make_unique<ComponentCondReference>(move(a)));
                   PUSH_SEQUENCE;
                   currentSeq = a_seq;
               };
               # Conditional reference with a positive lookbehind assertion
               '(?(?<=' => {
-                  auto a = ue2::make_unique<ComponentAssertion>(
+                  auto a = std::make_unique<ComponentAssertion>(
                       ComponentAssertion::LOOKBEHIND, ComponentAssertion::POS);
                   ComponentAssertion *a_seq = a.get();
                   PUSH_SEQUENCE;
                   currentSeq = enterSequence(currentSeq,
-                        ue2::make_unique<ComponentCondReference>(move(a)));
+                        std::make_unique<ComponentCondReference>(move(a)));
                   PUSH_SEQUENCE;
                   currentSeq = a_seq;
               };
               # Conditional reference with a negative lookbehind assertion
               '(?(?<!' => {
-                  auto a = ue2::make_unique<ComponentAssertion>(
+                  auto a = std::make_unique<ComponentAssertion>(
                       ComponentAssertion::LOOKBEHIND, ComponentAssertion::NEG);
                   ComponentAssertion *a_seq = a.get();
                   PUSH_SEQUENCE;
                   currentSeq = enterSequence(currentSeq,
-                        ue2::make_unique<ComponentCondReference>(move(a)));
+                        std::make_unique<ComponentCondReference>(move(a)));
                   PUSH_SEQUENCE;
                   currentSeq = a_seq;
               };
@@ -1953,7 +1952,7 @@ unique_ptr<Component> parse(const char *ptr, ParseMode &globalMode) {
     flat_set<string> groupNames;
 
     // Root sequence.
-    unique_ptr<ComponentSequence> rootSeq = ue2::make_unique<ComponentSequence>();
+    unique_ptr<ComponentSequence> rootSeq = std::make_unique<ComponentSequence>();
     rootSeq->setCaptureIndex(0);
 
     // Current sequence being appended to

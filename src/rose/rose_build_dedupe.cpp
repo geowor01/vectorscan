@@ -32,7 +32,6 @@
 #include "smallwrite/smallwrite_build.h"
 #include "util/compile_context.h"
 #include "util/boundary_reports.h"
-#include "util/make_unique.h"
 #include "util/report_manager.h"
 
 using namespace std;
@@ -100,7 +99,7 @@ private:
 };
 
 unique_ptr<RoseDedupeAux> RoseBuildImpl::generateDedupeAux() const {
-    return ue2::make_unique<RoseDedupeAuxImpl>(*this);
+    return std::make_unique<RoseDedupeAuxImpl>(*this);
 }
 
 RoseDedupeAux::~RoseDedupeAux() = default;

@@ -45,7 +45,6 @@
 #include "util/graph_range.h"
 #include "util/hash.h"
 #include "util/hash_dynamic_bitset.h"
-#include "util/make_unique.h"
 #include "util/report_manager.h"
 
 #include <algorithm>
@@ -568,7 +567,7 @@ unique_ptr<raw_dfa> buildMcClellan(const NGHolder &graph,
         return nullptr;
     }
 
-    auto rdfa = ue2::make_unique<raw_dfa>(graph.kind);
+    auto rdfa = std::make_unique<raw_dfa>(graph.kind);
 
     if (numStates <= NFA_STATE_LIMIT) {
         /* Fast path. Automaton_Graph uses a bitfield internally to represent

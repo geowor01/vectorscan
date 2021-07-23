@@ -31,7 +31,6 @@
 #include "gtest/gtest.h"
 #include "util/arch.h"
 #include "util/bytecode_ptr.h"
-#include "util/make_unique.h"
 #include "util/simd_utils.h"
 
 using namespace std;
@@ -522,7 +521,7 @@ TYPED_TEST(SimdUtilsTest, loadu) {
     const TypeParam ones = simd_ones();
 
     const size_t mem_len = sizeof(ones) * 2;
-    unique_ptr<char[]> mem_array = ue2::make_unique<char[]>(mem_len);
+    unique_ptr<char[]> mem_array = std::make_unique<char[]>(mem_len);
     char *mem = mem_array.get();
 
     for (size_t offset = 1; offset < sizeof(ones); offset++) {

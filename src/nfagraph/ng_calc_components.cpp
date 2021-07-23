@@ -58,7 +58,6 @@
 #include "ue2common.h"
 #include "util/graph_range.h"
 #include "util/graph_undirected.h"
-#include "util/make_unique.h"
 
 #include <map>
 #include <vector>
@@ -355,7 +354,7 @@ void splitIntoComponents(unique_ptr<NGHolder> g,
          * no deterministic ordering (split_components map). */
         sort(begin(vv), end(vv));
 
-        auto gc = ue2::make_unique<NGHolder>();
+        auto gc = std::make_unique<NGHolder>();
         v_map.clear();
         fillHolder(gc.get(), *g, vv, &v_map);
 
@@ -379,7 +378,7 @@ void splitIntoComponents(unique_ptr<NGHolder> g,
         vv.insert(vv.end(), begin(head_shell), end(head_shell));
         vv.insert(vv.end(), begin(tail_shell), end(tail_shell));
 
-        auto gc = ue2::make_unique<NGHolder>();
+        auto gc = std::make_unique<NGHolder>();
         v_map.clear();
         fillHolder(gc.get(), *g, vv, &v_map);
 

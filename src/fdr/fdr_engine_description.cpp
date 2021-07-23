@@ -31,7 +31,6 @@
 #include "hs_compile.h"
 #include "util/target_info.h"
 #include "util/compare.h" // for ourisalpha()
-#include "util/make_unique.h"
 
 #include <cassert>
 #include <cstdlib>
@@ -196,7 +195,7 @@ unique_ptr<FDREngineDescription> chooseEngine(const target_t &target,
     }
 
     DEBUG_PRINTF("using engine %u\n", best->getID());
-    return ue2::make_unique<FDREngineDescription>(*best);
+    return std::make_unique<FDREngineDescription>(*best);
 }
 
 SchemeBitIndex FDREngineDescription::getSchemeBit(BucketIndex b,
@@ -222,7 +221,7 @@ unique_ptr<FDREngineDescription> getFdrDescription(u32 engineID) {
         return nullptr;
     }
 
-    return ue2::make_unique<FDREngineDescription>(allDescs[engineID]);
+    return std::make_unique<FDREngineDescription>(allDescs[engineID]);
 }
 
 } // namespace ue2

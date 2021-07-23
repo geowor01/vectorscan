@@ -50,7 +50,6 @@
 #include "util/container.h"
 #include "util/graph.h"
 #include "util/graph_range.h"
-#include "util/make_unique.h"
 #include "util/order_check.h"
 #include "util/report_manager.h"
 #include "util/ue2string.h"
@@ -234,7 +233,7 @@ unique_ptr<RoseBuild> makeRoseBuilder(ReportManager &rm,
                                       SmallWriteBuild &smwr,
                                       const CompileContext &cc,
                                       const BoundaryReports &boundary) {
-    return ue2::make_unique<RoseBuildImpl>(rm, ssm, smwr, cc, boundary);
+    return std::make_unique<RoseBuildImpl>(rm, ssm, smwr, cc, boundary);
 }
 
 bool roseIsPureLiteral(const RoseEngine *t) {

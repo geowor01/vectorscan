@@ -41,7 +41,6 @@
 #include "ue2common.h"
 #include "util/container.h"
 #include "util/graph_range.h"
-#include "util/make_unique.h"
 #include "util/ue2string.h"
 #include "util/unicode_def.h"
 #include "util/unicode_set.h"
@@ -141,7 +140,7 @@ void findPaths(const NGHolder &g, CorpusProperties &cProps,
     const size_t MAX_OPEN = min((size_t)1000, corpusLimit * 10);
 
     vector<unique_ptr<VertexPath>> open;
-    open.push_back(ue2::make_unique<VertexPath>(1, g.start));
+    open.push_back(std::make_unique<VertexPath>(1, g.start));
 
     unordered_set<NFAVertex> one_way_in;
     for (const auto &v : vertices_range(g)) {
@@ -200,7 +199,7 @@ void findPaths(const NGHolder &g, CorpusProperties &cProps,
             if (boost::next(ai) == ae) {
                 new_path = std::move(p);
             } else {
-                new_path = make_unique<VertexPath>(*p);
+                new_path = std::make_unique<VertexPath>(*p);
             }
 
             new_path->push_back(v);
@@ -714,8 +713,8 @@ unique_ptr<CorpusGenerator> makeCorpusGenerator(const NGHolder &graph,
                                                 const ExpressionInfo &expr,
                                                 CorpusProperties &props) {
     if (expr.utf8) {
-        return ue2::make_unique<CorpusGeneratorUtf8>(graph, expr, props);
+        return std::make_unique<CorpusGeneratorUtf8>(graph, expr, props);
     } else {
-        return ue2::make_unique<CorpusGeneratorImpl>(graph, expr, props);
+        return std::make_unique<CorpusGeneratorImpl>(graph, expr, props);
     }
 }

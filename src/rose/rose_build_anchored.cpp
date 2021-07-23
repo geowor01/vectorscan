@@ -51,7 +51,6 @@
 #include "util/determinise.h"
 #include "util/flat_containers.h"
 #include "util/graph_range.h"
-#include "util/make_unique.h"
 #include "util/order_check.h"
 #include "util/ue2string.h"
 #include "util/unordered.h"
@@ -699,7 +698,7 @@ int addAutomaton(RoseBuildImpl &build, const NGHolder &h, ReportID *remap) {
 
     Automaton_Holder autom(h);
 
-    auto out_dfa = ue2::make_unique<raw_dfa>(NFA_OUTFIX_RAW);
+    auto out_dfa = std::make_unique<raw_dfa>(NFA_OUTFIX_RAW);
     if (determinise(autom, out_dfa->states, MAX_DFA_STATES)) {
         return finalise_out(build, h, autom, move(out_dfa), remap);
     }
@@ -761,7 +760,7 @@ void buildSimpleDfas(const RoseBuildImpl &build, const vector<u32> &frag_map,
         }
         auto h = populate_holder(simple.first, exit_ids);
         Automaton_Holder autom(*h);
-        auto rdfa = ue2::make_unique<raw_dfa>(NFA_OUTFIX_RAW);
+        auto rdfa = std::make_unique<raw_dfa>(NFA_OUTFIX_RAW);
         UNUSED bool rv = determinise(autom, rdfa->states, MAX_DFA_STATES);
         assert(rv);
         rdfa->start_anchored = INIT_STATE;

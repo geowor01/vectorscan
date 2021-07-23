@@ -48,7 +48,6 @@
 #include "util/flat_containers.h"
 #include "util/graph.h"
 #include "util/graph_range.h"
-#include "util/make_unique.h"
 #include "util/order_check.h"
 #include "util/report_manager.h"
 #include "util/unaligned.h"

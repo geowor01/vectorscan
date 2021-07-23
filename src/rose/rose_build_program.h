@@ -33,7 +33,6 @@
 #include "rose_program.h"
 #include "util/bytecode_ptr.h"
 #include "util/hash.h"
-#include "util/make_unique.h"
 
 #include <unordered_map>
 #include <vector>

@@ -41,7 +41,6 @@
 #include "nfagraph/ng_region.h"
 #include "util/charreach.h"
 #include "util/hash.h"
-#include "util/make_unique.h"
 #include "util/dump_charclass.h"
 #include "util/verify_types.h"
 
@@ -105,7 +104,7 @@ const SlotCacheEntry *SlotCache::find(const NGHolder &prefix,
 }
 
 SomSlotManager::SomSlotManager(u8 p)
-    : nextSomSlot(0), cache(ue2::make_unique<SlotCache>()), historyRequired(0),
+    : nextSomSlot(0), cache(std::make_unique<SlotCache>()), historyRequired(0),
       precision(p) {}
 
 SomSlotManager::~SomSlotManager() { }

@@ -31,7 +31,6 @@
 #include "gtest/gtest.h"
 #include "ue2common.h"
 #include "util/compile_error.h"
-#include "util/make_unique.h"
 #include "util/multibit.h"
 #include "util/multibit_build.h"
 #include "util/multibit_compress.h"
@@ -86,10 +85,10 @@ class mmbit_holder {
 public:
     mmbit_holder() {}
     explicit mmbit_holder(u32 num_bits, u32 excess = 0)
-        : data(ue2::make_unique<u8[]>(mmbit_size(num_bits) + 7 + excess)) {}
+        : data(std::make_unique<u8[]>(mmbit_size(num_bits) + 7 + excess)) {}
     void init(u32 num_bits) {
         assert(!data);
-        data = ue2::make_unique<u8[]>(mmbit_size(num_bits) + 7);
+        data = std::make_unique<u8[]>(mmbit_size(num_bits) + 7);
     }
     operator u8 *() {
         assert(data);
@@ -108,10 +107,10 @@ class comp_holder {
 public:
     comp_holder() {}
     explicit comp_holder(u32 length)
-        : data(ue2::make_unique<u8[]>(length + 7)) {}
+        : data(std::make_unique<u8[]>(length + 7)) {}
     void init(u32 length) {
         assert(!data);
-        data = ue2::make_unique<u8[]>(length + 7);
+        data = std::make_unique<u8[]>(length + 7);
     }
     operator u8 *() {
         assert(data);

@@ -34,7 +34,6 @@
 #include "nfa/repeat.h"
 #include "nfa/repeatcompile.h"
 #include "util/depth.h"
-#include "util/make_unique.h"
 
 #include <algorithm>
 #include <memory>
@@ -431,7 +430,7 @@ TEST_P(RepeatTest, Pack) {
     // We should be able to pack and then unpack the control block at any
     // offset up to repeatMin and get a match at both the min and max repeats.
 
-    unique_ptr<char[]> packed = ue2::make_unique<char[]>(info.packedCtrlSize);
+    unique_ptr<char[]> packed = std::make_unique<char[]>(info.packedCtrlSize);
 
     for (u32 i = 0; i < info.repeatMax; i++) {
         SCOPED_TRACE(testing::Message() << "i=" << i);

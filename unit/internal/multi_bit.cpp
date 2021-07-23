@@ -32,7 +32,6 @@
 #include "ue2common.h"
 #include "rose/rose_build_scatter.h"
 #include "util/compile_error.h"
-#include "util/make_unique.h"
 #include "util/multibit.h"
 #include "util/multibit_build.h"
 
@@ -49,10 +48,10 @@ class mmbit_holder {
 public:
     mmbit_holder() {}
     explicit mmbit_holder(u32 num_bits, u32 excess = 0)
-        : data(ue2::make_unique<u8[]>(mmbit_size(num_bits) + 7 + excess)) {}
+        : data(std::make_unique<u8[]>(mmbit_size(num_bits) + 7 + excess)) {}
     void init(u32 num_bits) {
         assert(!data);
-        data = ue2::make_unique<u8[]>(mmbit_size(num_bits) + 7);
+        data = std::make_unique<u8[]>(mmbit_size(num_bits) + 7);
     }
     operator u8 *() {
         assert(data);
@@ -727,7 +726,7 @@ TEST_P(MultiBitTest, InitRangeChunked) {
 }
 
 static
-void apply(const scatter_plan_raw &sp, u8 *out) {
+void applyMB(const scatter_plan_raw &sp, u8 *out) {
     for (const auto &e : sp.p_u64a) {
         memcpy(out + e.offset, &e.val, sizeof(e.val));
     }
@@ -761,7 +760,7 @@ TEST_P(MultiBitTest, InitRangePlanChunked) {
             scatter_plan_raw sp;
             mmbBuildInitRangePlan(test_size, chunk_begin, chunk_end, &sp);
             memset(ba, 0xaa, mmbit_size(test_size));
-            apply(sp, ba);
+            applyMB(sp, ba);
 
             // First bit set should be chunk_begin.
             ASSERT_EQ(chunk_begin, mmbit_iterate(ba, test_size, MMB_INVALID));

@@ -43,7 +43,6 @@
 #include "util/compare.h"
 #include "util/compile_context.h"
 #include "util/container.h"
-#include "util/make_unique.h"
 #include "util/order_check.h"
 #include "util/report_manager.h"
 #include "util/flat_containers.h"
@@ -393,7 +392,7 @@ unique_ptr<raw_report_info> mcclellan_build_strat::gatherReports(
 
     const bool remap_reports = has_managed_reports(rdfa.kind);
 
-    auto ri = ue2::make_unique<raw_report_info_impl>();
+    auto ri = std::make_unique<raw_report_info_impl>();
     map<raw_report_list, u32> rev;
 
     for (const dstate &s : rdfa.states) {

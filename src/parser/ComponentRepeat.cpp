@@ -41,7 +41,6 @@
 #include "position_dump.h"
 #include "position_info.h"
 #include "ue2common.h"
-#include "util/make_unique.h"
 
 #include <algorithm>
 #include <cassert>
@@ -362,7 +361,7 @@ void ComponentRepeat::postSubNotePositionHook() {
 unique_ptr<ComponentRepeat> makeComponentRepeat(unique_ptr<Component> sub_comp,
                                                 u32 min, u32 max,
                                                 ComponentRepeat::RepeatType t) {
-    return ue2::make_unique<ComponentRepeat>(move(sub_comp), min, max, t);
+    return std::make_unique<ComponentRepeat>(move(sub_comp), min, max, t);
 }
 
 } // namespace ue2

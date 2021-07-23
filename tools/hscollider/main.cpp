@@ -52,7 +52,6 @@
 #include "parser/utf8_validate.h"
 #include "ue2common.h"
 #include "util/container.h"
-#include "util/make_unique.h"
 
 #include <algorithm>
 #include <cassert>
@@ -1077,7 +1076,7 @@ void addCorporaToQueue(ostream &out, BoundedQueue<TestUnit> &testq, unsigned id,
 
     size_t corpus_id = 0;
     for (const Corpus &corpus : c) {
-        tests.push_back(ue2::make_unique<TestUnit>(id, corpus_id, corpus, cpcre,
+        tests.push_back(std::make_unique<TestUnit>(id, corpus_id, corpus, cpcre,
                                                    cngi, ue2, multi, utf8,
                                                    highlander, prefilter, som));
         corpus_id++;
@@ -1435,7 +1434,7 @@ unique_ptr<CorpusGenUnit> makeCorpusGenUnit(unsigned id, TestSummary &summary,
     // Caller may already have set the UTF-8 property (in multi cases)
     utf8 |= cpcre ? cpcre->utf8 : cngi->utf8;
 
-    return ue2::make_unique<CorpusGenUnit>(move(cngi), move(cpcre), ue2, id,
+    return std::make_unique<CorpusGenUnit>(move(cngi), move(cpcre), ue2, id,
                                            multi, utf8);
 }
 
@@ -1824,7 +1823,7 @@ static
 unique_ptr<CorporaSource> buildCorpora(const vector<string> &corporaFiles,
                                        const ExpressionMap &exprMap) {
     if (!corporaFiles.empty()) {
-        auto c = ue2::make_unique<FileCorpora>();
+        auto c = std::make_unique<FileCorpora>();
         for (const auto &file : corporaFiles) {
             if (!c->readFile(file)) {
                 cout << "Error reading corpora from file: " << file << endl;
@@ -1833,7 +1832,7 @@ unique_ptr<CorporaSource> buildCorpora(const vector<string> &corporaFiles,
         }
         return move(c); /* move allows unique_ptr<CorporaSource> conversion */
     } else {
-        auto c = ue2::make_unique<NfaGeneratedCorpora>(
+        auto c = std::make_unique<NfaGeneratedCorpora>(
             exprMap, corpus_gen_prop, force_utf8, force_prefilter);
         return move(c);
     }
@@ -1886,7 +1885,7 @@ bool runTests(CorporaSource &corpora_source, const ExpressionMap &exprMap,
     // Start scanning threads.
     vector<unique_ptr<ScanThread>> scanners;
     for (size_t i = 0; i < numScannerThreads; i++) {
-        auto s = ue2::make_unique<ScanThread>(i, testq, exprMap, plat, grey);
+        auto s = std::make_unique<ScanThread>(i, testq, exprMap, plat, grey);
         s->start();
         scanners.push_back(move(s));
     }
@@ -1989,7 +1988,7 @@ int HS_CDECL main(int argc, char *argv[]) {
 
     // If we're saving corpora out, truncate the output file.
     if (saveCorpora) {
-        corporaOut = ue2::make_unique<CorpusWriter>(saveCorporaFile);
+        corporaOut = std::make_unique<CorpusWriter>(saveCorporaFile);
     }
 
     GroundTruth::global_prep();

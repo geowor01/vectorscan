@@ -46,7 +46,6 @@
 #include "util/compile_context.h"
 #include "util/compile_error.h"
 #include "util/dump_charclass.h"
-#include "util/make_unique.h"
 #include "util/report.h"
 #include "util/report_manager.h"
 #include "util/verify_types.h"
@@ -937,7 +936,7 @@ buildFloatingMatcherProto(const RoseBuildImpl &build,
         throw CompileError("Unable to generate literal matcher proto.");
      }
 
-     return ue2::make_unique<LitProto>(move(proto), mp.accel_lits);
+     return std::make_unique<LitProto>(move(proto), mp.accel_lits);
 }
 
 unique_ptr<LitProto>
@@ -965,7 +964,7 @@ buildDelayRebuildMatcherProto(const RoseBuildImpl &build,
         throw CompileError("Unable to generate literal matcher proto.");
     }
 
-    return ue2::make_unique<LitProto>(move(proto), mp.accel_lits);
+    return std::make_unique<LitProto>(move(proto), mp.accel_lits);
 }
 
 unique_ptr<LitProto>
@@ -1022,7 +1021,7 @@ buildSmallBlockMatcherProto(const RoseBuildImpl &build,
         throw CompileError("Unable to generate literal matcher proto.");
     }
 
-    return ue2::make_unique<LitProto>(move(proto), mp.accel_lits);
+    return std::make_unique<LitProto>(move(proto), mp.accel_lits);
 }
 
 unique_ptr<LitProto>
@@ -1047,7 +1046,7 @@ buildEodAnchoredMatcherProto(const RoseBuildImpl &build,
         throw CompileError("Unable to generate literal matcher proto.");
     }
 
-    return ue2::make_unique<LitProto>(move(proto), mp.accel_lits);
+    return std::make_unique<LitProto>(move(proto), mp.accel_lits);
 }
 
 } // namespace ue2

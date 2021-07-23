@@ -46,7 +46,6 @@
 #include "sheng_internal.h"
 #include "ue2common.h"
 #include "util/compile_context.h"
-#include "util/make_unique.h"
 #include "util/verify_types.h"
 #include "util/simd_types.h"
 
@@ -203,7 +202,7 @@ unique_ptr<raw_report_info> sheng_build_strat::gatherReports(
 
     const bool remap_reports = has_managed_reports(rdfa.kind);
 
-    auto ri = ue2::make_unique<raw_report_info_impl>();
+    auto ri = std::make_unique<raw_report_info_impl>();
     map<raw_report_list, u32> rev;
 
     for (const dstate &s : rdfa.states) {

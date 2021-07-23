@@ -42,7 +42,6 @@
 #include "hs_internal.h"
 #include "hs_runtime.h"
 #include "util/database_util.h"
-#include "util/make_unique.h"
 
 #include <cassert>
 #include <cstring>
@@ -126,7 +125,7 @@ EngineHyperscan::~EngineHyperscan() {
 }
 
 unique_ptr<EngineContext> EngineHyperscan::makeContext() const {
-    return ue2::make_unique<EngineHSContext>(db);
+    return std::make_unique<EngineHSContext>(db);
 }
 
 void EngineHyperscan::scan(const char *data, unsigned int len, unsigned int id,
@@ -166,7 +165,7 @@ void EngineHyperscan::scan_vectored(const char *const *data,
 unique_ptr<EngineStream> EngineHyperscan::streamOpen(EngineContext &ectx,
                                                      unsigned streamId) const {
     EngineHSContext &ctx = static_cast<EngineHSContext &>(ectx);
-    auto stream = ue2::make_unique<EngineHSStream>();
+    auto stream = std::make_unique<EngineHSStream>();
     stream->ctx = &ctx;
 
     hs_open_stream(db, 0, &stream->id);
@@ -549,5 +548,5 @@ buildEngineHyperscan(const ExpressionMap &expressions, ScanMode scan_mode,
     cs.compileSecs = compileSecs;
     cs.peakMemorySize = peakMemorySize;
 
-    return ue2::make_unique<EngineHyperscan>(db, std::move(cs));
+    return std::make_unique<EngineHyperscan>(db, std::move(cs));
 }

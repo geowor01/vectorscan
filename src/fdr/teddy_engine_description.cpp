@@ -34,7 +34,6 @@
 #include "fdr_engine_description.h"
 #include "teddy_internal.h"
 #include "teddy_engine_description.h"
-#include "util/make_unique.h"
 
 #include <cmath>
 
@@ -197,7 +196,7 @@ chooseTeddyEngine(const target_t &target, const vector<hwlmLiteral> &vl) {
     }
 
     DEBUG_PRINTF("using engine %u\n", best->getID());
-    return ue2::make_unique<TeddyEngineDescription>(*best);
+    return std::make_unique<TeddyEngineDescription>(*best);
 }
 
 unique_ptr<TeddyEngineDescription> getTeddyDescription(u32 engineID) {
@@ -206,7 +205,7 @@ unique_ptr<TeddyEngineDescription> getTeddyDescription(u32 engineID) {
 
     for (const auto &desc : descs) {
         if (desc.getID() == engineID) {
-            return ue2::make_unique<TeddyEngineDescription>(desc);
+            return std::make_unique<TeddyEngineDescription>(desc);
         }
     }
 

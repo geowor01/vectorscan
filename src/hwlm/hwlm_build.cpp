@@ -46,7 +46,6 @@
 #include "fdr/teddy_engine_description.h"
 #include "util/compile_context.h"
 #include "util/compile_error.h"
-#include "util/make_unique.h"
 #include "util/ue2string.h"
 
 #include <cassert>
@@ -201,7 +200,7 @@ hwlmBuildProto(vector<hwlmLiteral> &lits, bool make_small,
 
     if (isNoodleable(lits, cc)) {
         DEBUG_PRINTF("build noodle table\n");
-        proto = ue2::make_unique<HWLMProto>(HWLM_ENGINE_NOOD, lits);
+        proto = std::make_unique<HWLMProto>(HWLM_ENGINE_NOOD, lits);
     } else {
         DEBUG_PRINTF("building a new deal\n");
         proto = fdrBuildProto(HWLM_ENGINE_FDR, lits, make_small,

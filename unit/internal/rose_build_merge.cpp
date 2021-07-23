@@ -39,7 +39,6 @@
 #include "util/boundary_reports.h"
 #include "util/compile_context.h"
 #include "util/graph_range.h"
-#include "util/make_unique.h"
 #include "smallwrite/smallwrite_build.h"
 #include "som/slot_manager.h"
 
@@ -52,7 +51,7 @@ using namespace ue2;
 
 static
 std::unique_ptr<NGHolder> makeSuffixGraph(ReportID report) {
-    auto h = ue2::make_unique<NGHolder>(NFA_SUFFIX);
+    auto h = std::make_unique<NGHolder>(NFA_SUFFIX);
     NGHolder &g = *h;
 
     NFAVertex v = add_vertex(g);

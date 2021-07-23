@@ -62,7 +62,6 @@
 #include "util/graph_range.h"
 #include "util/graph_small_color_map.h"
 #include "util/insertion_ordered.h"
-#include "util/make_unique.h"
 #include "util/order_check.h"
 #include "util/target_info.h"
 #include "util/ue2string.h"
@@ -70,6 +69,7 @@
 #include <set>
 #include <utility>
 #include <vector>
+#include <memory>
 #include <boost/dynamic_bitset.hpp>
 #include <boost/range/adaptor/map.hpp>
 
@@ -375,7 +375,7 @@ void getSimpleRoseLiterals(const NGHolder &g, bool seeking_anchored,
 
         DEBUG_PRINTF("candidate is a candidate\n");
         scores[v] = score;
-        lit_info[v] = make_unique<VertLitInfo>(v, s, anchored);
+        lit_info[v] = std::make_unique<VertLitInfo>(v, s, anchored);
     }
 
     /* try to filter out cases where appending some characters produces worse
@@ -531,7 +531,7 @@ void getRegionRoseLiterals(const NGHolder &g, bool seeking_anchored,
         }
 
         DEBUG_PRINTF("candidate is a candidate\n");
-        lits->emplace_back(make_unique<VertLitInfo>(vv, s, anchored));
+        lits->emplace_back(std::make_unique<VertLitInfo>(vv, s, anchored));
     }
 }
 
@@ -945,7 +945,7 @@ unique_ptr<VertLitInfo> findSimplePrefixSplit(const NGHolder &g,
         sanitizeAndCompressAndScore(best_lit_set);
     }
 
-    return ue2::make_unique<VertLitInfo>(best_v, best_lit_set, anchored, true);
+    return std::make_unique<VertLitInfo>(best_v, best_lit_set, anchored, true);
 }
 
 static
@@ -1835,7 +1835,7 @@ static
 unique_ptr<NGHolder> make_chain(u32 count) {
     assert(count);
 
-    auto rv = make_unique<NGHolder>(NFA_INFIX);
+    auto rv = std::make_unique<NGHolder>(NFA_INFIX);
 
     NGHolder &h = *rv;
 

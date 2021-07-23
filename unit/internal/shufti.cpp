@@ -894,6 +894,7 @@ TEST(DoubleShufti, ExecMatchMixed3) {
     for (size_t i = 0; i < 400; i++) {
         t2[len - i] = 'x';
         t2[len - i + 1] = 'y';
+        DEBUG_PRINTF("i = %ld\n", i);
         const u8 *rv = shuftiDoubleExec(lo1, hi1, lo2, hi2,
                                         (u8 *)t2, (u8 *)t2 + len);
 
@@ -1106,6 +1107,7 @@ TEST(ReverseShufti, ExecMatch6) {
 
     for (size_t i = 0; i < len; i++) {
         t1[i] = 'a';
+        DEBUG_PRINTF("i=%ld\n", i);
         const u8 *rv = rshuftiExec(lo, hi, (u8 *)t1, (u8 *)t1 + len);
 
         ASSERT_EQ((const u8 *)t1 + i, rv);

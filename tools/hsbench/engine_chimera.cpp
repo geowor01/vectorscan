@@ -38,8 +38,6 @@
 
 #include "chimera/ch_database.h"
 
-#include "util/make_unique.h"
-
 using namespace std;
 
 EngineCHContext::EngineCHContext(const ch_database_t *db) {
@@ -105,7 +103,7 @@ EngineChimera::~EngineChimera() {
 }
 
 unique_ptr<EngineContext> EngineChimera::makeContext() const {
-    return ue2::make_unique<EngineCHContext>(db);
+    return std::make_unique<EngineCHContext>(db);
 }
 
 void EngineChimera::scan(const char *data, unsigned int len, unsigned int id,
@@ -333,5 +331,5 @@ buildEngineChimera(const ExpressionMap &expressions, const string &name,
     cs.compileSecs = compileSecs;
     cs.peakMemorySize = peakMemorySize;
 
-    return ue2::make_unique<EngineChimera>(db, move(cs));
+    return std::make_unique<EngineChimera>(db, move(cs));
 }

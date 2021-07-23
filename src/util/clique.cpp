@@ -33,7 +33,6 @@
 #include "clique.h"
 #include "container.h"
 #include "graph_range.h"
-#include "make_unique.h"
 
 #include <map>
 #include <set>

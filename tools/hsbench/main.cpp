@@ -45,7 +45,6 @@
 #include "grey.h"
 #include "hs.h"
 #include "ue2common.h"
-#include "util/make_unique.h"
 
 #include <algorithm>
 #include <clocale>
@@ -979,7 +978,7 @@ unique_ptr<ThreadContext> makeThreadContext(const Engine &db,
     }
     assert(fn);
 
-    return ue2::make_unique<ThreadContext>(id, db, sync_barrier, fn, blocks);
+    return std::make_unique<ThreadContext>(id, db, sync_barrier, fn, blocks);
 }
 
 /** Run the given benchmark. */

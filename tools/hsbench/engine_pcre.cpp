@@ -38,7 +38,6 @@
 #include "sqldb.h"
 #include "timer.h"
 
-#include "util/make_unique.h"
 #include "util/unicode_def.h"
 
 #include <algorithm>
@@ -105,7 +104,7 @@ EnginePCRE::~EnginePCRE() {
 }
 
 unique_ptr<EngineContext> EnginePCRE::makeContext() const {
-    return ue2::make_unique<EnginePCREContext>(capture_cnt);
+    return std::make_unique<EnginePCREContext>(capture_cnt);
 }
 
 void EnginePCRE::scan(const char *data, unsigned int len, unsigned int id,
@@ -322,7 +321,7 @@ buildEnginePcre(const ExpressionMap &expressions, const string &name,
     for (const auto &m : expressions) {
         string expr(m.second);
         unsigned int flags = 0;
-        auto pcreDB = ue2::make_unique<PcreDB>();
+        auto pcreDB = std::make_unique<PcreDB>();
         if (!decodeExprPCRE(expr, &flags, *pcreDB)) {
             printf("Error parsing PCRE: %s (id %u)\n", m.second.c_str(),
                     m.first);
@@ -406,5 +405,5 @@ buildEnginePcre(const ExpressionMap &expressions, const string &name,
     cs.compileSecs = compileSecs;
     cs.peakMemorySize = peakMemorySize;
 
-    return ue2::make_unique<EnginePCRE>(move(dbs), move(cs), capture_cnt);
+    return std::make_unique<EnginePCRE>(move(dbs), move(cs), capture_cnt);
 }

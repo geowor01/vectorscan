@@ -31,7 +31,6 @@
 #include "cross_compile.h"
 #include "src/ue2common.h"
 #include "src/hs_compile.h"
-#include "src/util/make_unique.h"
 
 #include <sstream>
 #include <string>
@@ -74,7 +73,7 @@ unique_ptr<hs_platform_info> xcompileReadMode(const char *s) {
         return nullptr;
     } else {
         DEBUG_PRINTF("cpu_features %llx\n", rv.cpu_features);
-        return ue2::make_unique<hs_platform_info>(rv);
+        return std::make_unique<hs_platform_info>(rv);
     }
 }
 

@@ -39,7 +39,6 @@
 #include "crc32.h"
 #include "hs.h"
 #include "hs_internal.h"
-#include "util/make_unique.h"
 
 #include "scratch.h"
 #include "nfa/nfa_api_queue.h"
@@ -948,7 +947,7 @@ compileHyperscan(vector<const char *> &patterns, vector<unsigned> &flags,
         return nullptr;
     }
 
-    return ue2::make_unique<HyperscanDB>(db, idsvec.begin(), idsvec.end());
+    return std::make_unique<HyperscanDB>(db, idsvec.begin(), idsvec.end());
 }
 
 #ifdef HS_HYBRID
@@ -970,7 +969,7 @@ compileHybrid(vector<const char *> &patterns,
         return nullptr;
     }
 
-    return ue2::make_unique<HybridDB>(db, idsvec.begin(), idsvec.end());
+    return std::make_unique<HybridDB>(db, idsvec.begin(), idsvec.end());
 }
 #endif
 
