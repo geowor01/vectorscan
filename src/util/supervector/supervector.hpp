@@ -216,6 +216,7 @@ public:
   SuperVector alignr(SuperVector &other, int8_t offset);
 
   SuperVector pshufb(SuperVector b);
+  SuperVector pshufb_maskz(SuperVector b, uint8_t const len);
   SuperVector lshift64(uint8_t const N);
   SuperVector rshift64(uint8_t const N);
   SuperVector lshift128(uint8_t const N);

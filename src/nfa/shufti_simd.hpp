@@ -236,6 +236,44 @@ const u8 *fwdBlockDouble(SuperVector<S> mask1_lo, SuperVector<S> mask1_hi, Super
 }
 
 template <uint16_t S>
+static really_inline const u8 *shuftiDoubleMini(SuperVector<S> mask1_lo, SuperVector<S> mask1_hi, SuperVector<S> mask2_lo, SuperVector<S> mask2_hi,
+                       const u8 *buf, const u8 *buf_end){
+    uintptr_t len = buf_end - buf;
+    assert(len < S);
+
+    const SuperVector<S> low4bits = SuperVector<S>::dup_u8(0xf);
+
+    DEBUG_PRINTF("buf %p buf_end %p \n", buf, buf_end);
+    SuperVector<S> chars = SuperVector<S>::loadu_maskz(buf, len);
+    chars.print8("chars");
+
+    SuperVector<S> chars_lo = chars & low4bits;
+    chars_lo.print8("chars_lo");
+    SuperVector<S> chars_hi = chars.rshift64(4) & low4bits;
+    chars_hi.print8("chars_hi");
+    SuperVector<S> c1_lo = mask1_lo.pshufb_maskz(chars_lo, len);
+    c1_lo.print8("c1_lo");
+    SuperVector<S> c1_hi = mask1_hi.pshufb_maskz(chars_hi, len);
+    c1_hi.print8("c1_hi");
+    SuperVector<S> t1 = c1_lo | c1_hi;
+    t1.print8("t1");
+
+    SuperVector<S> c2_lo = mask2_lo.pshufb_maskz(chars_lo, len);
+    c2_lo.print8("c2_lo");
+    SuperVector<S> c2_hi = mask2_hi.pshufb_maskz(chars_hi, len);
+    c2_hi.print8("c2_hi");
+    SuperVector<S> t2 = c2_lo | c2_hi;
+    t2.print8("t2");
+    t2.rshift128(1).print8("t2.rshift128(1)");
+    SuperVector<S> t = t1 | (t2.rshift128(1));
+    t.print8("t");
+
+    typename SuperVector<S>::movemask_type z = t.eqmask(SuperVector<S>::Ones());
+    DEBUG_PRINTF(" z: 0x%016llx\n", (u64a)z);
+    return firstMatch<S>(buf, z);
+}
+
+template <uint16_t S>
 const u8 *shuftiDoubleExecReal(m128 mask1_lo, m128 mask1_hi, m128 mask2_lo, m128 mask2_hi,
                            const u8 *buf, const u8 *buf_end) {
         assert(buf && buf_end);
@@ -284,8 +322,7 @@ const u8 *shuftiDoubleExecReal(m128 mask1_lo, m128 mask1_hi, m128 mask2_lo, m128
     // finish off tail
 
     if (d != buf_end) {
-        SuperVector<S> chars = SuperVector<S>::loadu(buf_end - S);
-        rv = fwdBlockDouble(wide_mask1_lo, wide_mask1_hi, wide_mask2_lo, wide_mask2_hi, chars, buf_end - S);
+        rv = shuftiDoubleMini(wide_mask1_lo, wide_mask1_hi, wide_mask2_lo, wide_mask2_hi, d, buf_end);
         DEBUG_PRINTF("rv %p \n", rv);
         if (rv >= buf && rv < buf_end) return rv;
     }

@@ -312,6 +312,13 @@ really_inline SuperVector<16> SuperVector<16>::pshufb(SuperVector<16> b)
     return {_mm_shuffle_epi8(u.v128[0], b.u.v128[0])};
 }
 
+template<>
+really_inline SuperVector<16> SuperVector<16>::pshufb_maskz(SuperVector<16> b, uint8_t const len)
+{
+    SuperVector<16> mask = Ones().rshift128_var(16 -len);
+    return mask & pshufb(b);
+}
+
 #ifdef HS_OPTIMIZE
 template<>
 really_inline SuperVector<16> SuperVector<16>::lshift64(uint8_t const N)
@@ -731,6 +738,13 @@ template<>
 really_inline SuperVector<32> SuperVector<32>::pshufb(SuperVector<32> b)
 {
     return {_mm256_shuffle_epi8(u.v256[0], b.u.v256[0])};
+}
+
+template<>
+really_inline SuperVector<32> SuperVector<32>::pshufb_maskz(SuperVector<32> b, uint8_t const len)
+{
+    SuperVector<32> mask = Ones().rshift128_var(32 -len);
+    return mask & pshufb(b);
 }
 
 #ifdef HS_OPTIMIZE
@@ -1176,6 +1190,13 @@ really_inline SuperVector<64> SuperVector<64>::pshufb(SuperVector<64> b)
     return {_mm512_shuffle_epi8(u.v512[0], b.u.v512[0])};
 }
 
+template<>
+really_inline SuperVector<64> SuperVector<64>::pshufb_maskz(SuperVector<64> b, uint8_t const len)
+{
+    u64a mask = (~0ULL) >> (64 - len);
+    DEBUG_PRINTF("mask = %016llx\n", mask);
+    return {_mm512_maskz_shuffle_epi8(mask, u.v512[0], b.u.v512[0])};
+}
 
 #ifdef HS_OPTIMIZE
 template<>

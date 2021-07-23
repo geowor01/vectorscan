@@ -348,6 +348,13 @@ really_inline SuperVector<16> SuperVector<16>::pshufb(SuperVector<16> b)
     return {vqtbl1q_s8((int8x16_t)u.v128[0], (uint8x16_t)btranslated)};
 }
 
+template<>
+really_inline SuperVector<16> SuperVector<16>::pshufb_maskz(SuperVector<16> b, uint8_t const len)
+{
+    SuperVector<16> mask = Ones().rshift128_var(16 -len);
+    return mask & pshufb(b);
+}
+
 #ifdef HS_OPTIMIZE
 template<>
 really_inline SuperVector<16> SuperVector<16>::lshift64(uint8_t const N)
